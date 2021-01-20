@@ -1,0 +1,25 @@
+{
+    "name": "grigor/scanner",
+    "description": "Сканер",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Scanner\\": [
+                "src/Scanner/"
+            ],
+            "ScannerTest\\": [
+                "tests/ScannerTest/"
+            ]
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0@dev"
+    },
+    "scripts": {
+        "tests": "phpunit --colors=always"
+    }
+  }
