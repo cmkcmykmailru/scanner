@@ -64,10 +64,6 @@ class ExampleListener extends DetectAdapter
         $this->scanner = $scanner;
     }
 
-    public function detectStarted(DetectEvent $evt): void {}
-
-    public function detectCompleted(DetectEvent $evt): void {}
-
     public function leafDetected(NodeEvent $evt): void
     {
         echo $evt->getNode()->getSource() . PHP_EOL;
