@@ -51,7 +51,6 @@ $scanner->detect(realpath(__DIR__ . '/../src'));
 <?php
 
 use Scanner\Event\DetectAdapter;
-use Scanner\Event\DetectEvent;
 use Scanner\Event\NodeEvent;
 use Scanner\Scanner;
 
@@ -64,10 +63,6 @@ class ExampleListener extends DetectAdapter
         $this->scanner = $scanner;
     }
 
-    public function detectStarted(DetectEvent $evt): void {}
-
-    public function detectCompleted(DetectEvent $evt): void {}
-
     public function leafDetected(NodeEvent $evt): void
     {
         echo $evt->getNode()->getSource() . PHP_EOL;
@@ -75,7 +70,7 @@ class ExampleListener extends DetectAdapter
 
     public function nodeDetected(NodeEvent $evt): void
     {
-        $this->scanner->detect($evt->getNode()->getSource()) . PHP_EOL;
+       $this->scanner->getDriver()->detect($evt->getNode()->getSource());
     }
 }
 ```
@@ -87,24 +82,24 @@ $ php example/index.php
 
 вывод
 ```php
-/var/www/scaner/src/Scanner/Driver/AbstractDriver.php
-/var/www/scaner/src/Scanner/Driver/ContextSupport.php
-/var/www/scaner/src/Scanner/Driver/Driver.php
-/var/www/scaner/src/Scanner/Driver/File/Directory.php
-/var/www/scaner/src/Scanner/Driver/File/File.php
-/var/www/scaner/src/Scanner/Driver/File/FileDriver.php
-/var/www/scaner/src/Scanner/Driver/Leaf.php
-/var/www/scaner/src/Scanner/Driver/ListenerStorage.php
-/var/www/scaner/src/Scanner/Driver/ListenerSupport.php
-/var/www/scaner/src/Scanner/Driver/Node.php
-/var/www/scaner/src/Scanner/Event/AbstractEvent.php
-/var/www/scaner/src/Scanner/Event/DetectAdapter.php
-/var/www/scaner/src/Scanner/Event/DetectEvent.php
-/var/www/scaner/src/Scanner/Event/DetectListener.php
-/var/www/scaner/src/Scanner/Event/Event.php
-/var/www/scaner/src/Scanner/Event/LeafListener.php
-/var/www/scaner/src/Scanner/Event/Listener.php
-/var/www/scaner/src/Scanner/Event/NodeEvent.php
-/var/www/scaner/src/Scanner/Event/NodeListener.php
-/var/www/scaner/src/Scanner/Scanner.php
+/var/www/scanner/src/Scanner/Driver/AbstractDriver.php
+/var/www/scanner/src/Scanner/Driver/ContextSupport.php
+/var/www/scanner/src/Scanner/Driver/Driver.php
+/var/www/scanner/src/Scanner/Driver/File/Directory.php
+/var/www/scanner/src/Scanner/Driver/File/File.php
+/var/www/scanner/src/Scanner/Driver/File/FileDriver.php
+/var/www/scanner/src/Scanner/Driver/Leaf.php
+/var/www/scanner/src/Scanner/Driver/ListenerStorage.php
+/var/www/scanner/src/Scanner/Driver/ListenerSupport.php
+/var/www/scanner/src/Scanner/Driver/Node.php
+/var/www/scanner/src/Scanner/Event/AbstractEvent.php
+/var/www/scanner/src/Scanner/Event/DetectAdapter.php
+/var/www/scanner/src/Scanner/Event/DetectEvent.php
+/var/www/scanner/src/Scanner/Event/DetectListener.php
+/var/www/scanner/src/Scanner/Event/Event.php
+/var/www/scanner/src/Scanner/Event/LeafListener.php
+/var/www/scanner/src/Scanner/Event/Listener.php
+/var/www/scanner/src/Scanner/Event/NodeEvent.php
+/var/www/scanner/src/Scanner/Event/NodeListener.php
+/var/www/scanner/src/Scanner/Scanner.php
 ```

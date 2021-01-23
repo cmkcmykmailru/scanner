@@ -22,4 +22,6 @@ interface Driver
 
     public function removeDetectedListener(DetectListener $listener): void;
 
+    public function getNormalizer(): Normalizer;
+
 }
