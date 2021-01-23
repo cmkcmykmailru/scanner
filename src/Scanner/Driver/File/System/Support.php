@@ -4,11 +4,10 @@
 namespace Scanner\Driver\File\System;
 
 use Scanner\Driver\File\Component;
-use Scanner\Driver\Node;
 
 interface Support
 {
-    public static function create(Node $node): self;
+    public static function create(Component $component): self;
 
     public function install(Component $component): void;
 

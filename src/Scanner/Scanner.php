@@ -12,6 +12,8 @@ use Scanner\Event\DetectAdapter;
 use Scanner\Event\DetectListener;
 use Scanner\Event\LeafListener;
 use Scanner\Event\NodeListener;
+use Scanner\Filter\LeafFilter;
+use Scanner\Filter\NodeFilter;
 
 /**
  * Class Scanner
@@ -23,6 +25,9 @@ class Scanner
      * @var Driver
      */
     private Driver $driver;
+    private ?LeafFilter $leafFilter = null;
+    private ?NodeFilter $NodeFilter = null;
+    private bool $stop = false;
 
     /**
      * Scanner constructor.
@@ -42,6 +47,9 @@ class Scanner
      */
     public function detect($detect): void
     {
+        if ($this->stop) {
+            return;
+        }
         $detect = $this->driver->getNormalizer()->normalise($detect);
 
         $this->fireStartDetected($detect);
@@ -55,17 +63,73 @@ class Scanner
         $nodes = [];
         foreach ($founds as $found) {
             if ($explorer->isLeaf($found)) {
-                $this->fireLeafDetected($nodeFactory->createLeaf($detect, $found));
+                $leaf = $nodeFactory->createLeaf($detect, $found);
+                if ($this->filterLeaf($leaf)) {
+                    $this->fireLeafDetected($leaf);
+                }
             } else {
-                $nodes[] = $nodeFactory->createNode($detect, $found);
+                $node1 = $nodeFactory->createNode($detect, $found);
+                if ($this->filterNode($node1)) {
+                    $nodes[] = $node1;
+                }
+            }
+            if ($this->stop) {
+                $this->fireCompleteDetected($detect);
+                return;
             }
         }
 
         foreach ($nodes as $node) {
             $this->fireNodeDetected($node);
+            if ($this->stop) {
+                $this->fireCompleteDetected($detect);
+                return;
+            }
         }
 
         $this->fireCompleteDetected($detect);
+    }
+
+    /**
+     * @return LeafFilter|null
+     */
+    public function getLeafFilter(): ?LeafFilter
+    {
+        return $this->leafFilter;
+    }
+
+    /**
+     * @param LeafFilter|null $leafFilter
+     */
+    public function setLeafFilter(LeafFilter $leafFilter): void
+    {
+        $this->leafFilter = $leafFilter;
+    }
+
+    /**
+     * @return NodeFilter|null
+     */
+    public function getNodeFilter(): ?NodeFilter
+    {
+        return $this->NodeFilter;
+    }
+
+    /**
+     * @param NodeFilter|null $NodeFilter
+     */
+    public function setNodeFilter(NodeFilter $NodeFilter): void
+    {
+        $this->NodeFilter = $NodeFilter;
+    }
+
+    private function filterLeaf(Leaf $found): bool
+    {
+        return $this->leafFilter ? $this->leafFilter->filterLeaf($found) : true;
+    }
+
+    private function filterNode(Node $found): bool
+    {
+        return $this->NodeFilter ? $this->NodeFilter->filterNode($found) : true;
     }
 
     /**
@@ -82,6 +146,22 @@ class Scanner
     public function setDriver(Driver $driver): void
     {
         $this->driver = $driver;
+    }
+
+    /**
+     * @param bool $stop
+     */
+    public function stop(bool $stop): void
+    {
+        $this->stop = $stop;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isStop(): bool
+    {
+        return $this->stop;
     }
 
     public function addDetectAdapter(DetectAdapter $adapter): void
