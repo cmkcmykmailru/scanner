@@ -3,15 +3,17 @@
 
 namespace Scanner\Driver\File;
 
-use Scanner\Driver\AbstractDriver;
+use Scanner\Driver\Driver;
+use Scanner\Driver\Normalizer;
 use Scanner\Driver\Parser\Explorer;
 use Scanner\Driver\Parser\NodeFactory;
 use Scanner\Driver\Parser\Parser;
 
-class FileDriver extends AbstractDriver
+class FileDriver implements Driver
 {
     protected NodeFactory $nodeFactory;
     protected PathParser $parser;
+    protected Normalizer $normalizer;
 
     /**
      * FileDriver constructor.
@@ -37,5 +39,18 @@ class FileDriver extends AbstractDriver
     public function getNodeFactory(): NodeFactory
     {
         return $this->nodeFactory;
+    }
+
+    public function setNormalizer(Normalizer $normalizer): void
+    {
+        $this->normalizer = $normalizer;
+    }
+
+    /**
+     * @return Normalizer
+     */
+    public function getNormalizer(): Normalizer
+    {
+        return $this->normalizer;
     }
 }
