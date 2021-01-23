@@ -6,17 +6,17 @@ namespace Scanner\Driver\File;
 
 use Scanner\Driver\Leaf;
 use Scanner\Driver\Node;
-use Scanner\Driver\Parser\NodeBuilder;
+use Scanner\Driver\Parser\NodeFactory;
 
-class PathNodeBuilder implements NodeBuilder
+class PathNodeFactory implements NodeFactory
 {
 
-    public function buildNode($detect, $found): Node
+    public function createNode($detect, $found): Node
     {
         return new Directory($detect . DIRECTORY_SEPARATOR . $found);
     }
 
-    public function buildLeaf($detect, $found): Leaf
+    public function createLeaf($detect, $found): Leaf
     {
         return new File($detect . DIRECTORY_SEPARATOR . $found);
     }

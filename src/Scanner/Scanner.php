@@ -2,8 +2,12 @@
 
 namespace Scanner;
 
+use Scanner\Driver\ContextSupport;
 use Scanner\Driver\Driver;
 use Scanner\Driver\File\FileDriver;
+use Scanner\Driver\File\PathNodeFactory;
+use Scanner\Driver\Leaf;
+use Scanner\Driver\Node;
 use Scanner\Event\DetectAdapter;
 use Scanner\Event\DetectListener;
 use Scanner\Event\LeafListener;
@@ -27,7 +31,7 @@ class Scanner
     public function __construct(Driver $driver = null)
     {
         if ($driver === null) {
-            $this->driver = new FileDriver();
+            $this->driver = new FileDriver(new PathNodeFactory());
         } else {
             $this->driver = $driver;
         }
@@ -39,7 +43,29 @@ class Scanner
     public function detect($detect): void
     {
         $detect = $this->driver->getNormalizer()->normalise($detect);
-        $this->driver->detect($detect);
+
+        $this->fireStartDetected($detect);
+
+        $founds = $this->driver->getParser()->parese($detect);
+
+        $nodeFactory = $this->driver->getNodeFactory();
+        $explorer = $this->driver->getExplorer();
+        $explorer->setDetect($detect);
+
+        $nodes = [];
+        foreach ($founds as $found) {
+            if ($explorer->isLeaf($found)) {
+                $this->fireLeafDetected($nodeFactory->createLeaf($detect, $found));
+            } else {
+                $nodes[] = $nodeFactory->createNode($detect, $found);
+            }
+        }
+
+        foreach ($nodes as $node) {
+            $this->fireNodeDetected($node);
+        }
+
+        $this->fireCompleteDetected($detect);
     }
 
     /**
@@ -60,47 +86,59 @@ class Scanner
 
     public function addDetectAdapter(DetectAdapter $adapter): void
     {
-        $this->driver->addNodeListener($adapter);
-        $this->driver->addLeafListener($adapter);
-        $this->driver->addDetectedListener($adapter);
-    }
-
-    public function removeDetectAdapter(DetectAdapter $adapter): void
-    {
-        $this->driver->removeNodeListener($adapter);
-        $this->driver->removeLeafListener($adapter);
-        $this->driver->removeDetectedListener($adapter);
+        $this->addNodeListener($adapter);
+        $this->addLeafListener($adapter);
+        $this->addDetectedListener($adapter);
     }
 
     public function addNodeListener(NodeListener $listener): void
     {
-        $this->driver->addNodeListener($listener);
+        ContextSupport::getSupport($this)->addNodeListener($listener);
     }
 
     public function addLeafListener(LeafListener $listener): void
     {
-        $this->driver->addLeafListener($listener);
+        ContextSupport::getSupport($this)->addLeafListener($listener);
     }
 
     public function addDetectedListener(DetectListener $listener): void
     {
-        $this->driver->addDetectedListener($listener);
+        ContextSupport::getSupport($this)->addDetectedListener($listener);
     }
 
     public function removeNodeListener(NodeListener $listener): void
     {
-        $this->driver->removeNodeListener($listener);
+        ContextSupport::getSupport($this)->removeNodeListener($listener);
     }
 
     public function removeLeafListener(LeafListener $listener): void
     {
-        $this->driver->removeLeafListener($listener);
+        ContextSupport::getSupport($this)->removeLeafListener($listener);
     }
 
     public function removeDetectedListener(DetectListener $listener): void
     {
-        $this->driver->removeDetectedListener($listener);
+        ContextSupport::getSupport($this)->removeDetectedListener($listener);
     }
 
+    protected function fireLeafDetected(Leaf $leaf): void
+    {
+        ContextSupport::getSupport($this)->fireLeafDetected($this, $leaf);
+    }
+
+    protected function fireNodeDetected(Node $node): void
+    {
+        ContextSupport::getSupport($this)->fireNodeDetected($this, $node);
+    }
+
+    protected function fireStartDetected(string $detect): void
+    {
+        ContextSupport::getSupport($this)->fireStartDetected($this, $detect);
+    }
+
+    protected function fireCompleteDetected(string $detect): void
+    {
+        ContextSupport::getSupport($this)->fireCompleteDetected($this, $detect);
+    }
 
 }

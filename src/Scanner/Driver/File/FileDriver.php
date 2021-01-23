@@ -5,36 +5,37 @@ namespace Scanner\Driver\File;
 
 use Scanner\Driver\AbstractDriver;
 use Scanner\Driver\Parser\Explorer;
-use Scanner\Driver\Parser\NodeBuilder;
+use Scanner\Driver\Parser\NodeFactory;
 use Scanner\Driver\Parser\Parser;
 
 class FileDriver extends AbstractDriver
 {
-    protected PathNodeBuilder $filesNodeBuilder;
-    protected PathParser $pathParser;
+    protected NodeFactory $nodeFactory;
+    protected PathParser $parser;
 
     /**
      * FileDriver constructor.
+     * @param NodeFactory $factory
      */
-    public function __construct()
+    public function __construct(NodeFactory $factory)
     {
         $this->setNormalizer(new PathNormalizer());
-        $this->filesNodeBuilder = new PathNodeBuilder();
-        $this->pathParser = new PathParser();
+        $this->nodeFactory = $factory;
+        $this->parser = new PathParser();
     }
 
-    protected function getParser(): Parser
+    public function getParser(): Parser
     {
-        return $this->pathParser;
+        return $this->parser;
     }
 
-    protected function getExplorer(): Explorer
+    public function getExplorer(): Explorer
     {
-        return $this->pathParser;
+        return $this->parser;
     }
 
-    protected function getNodeBuilder(): NodeBuilder
+    public function getNodeFactory(): NodeFactory
     {
-        return $this->filesNodeBuilder;
+        return $this->nodeFactory;
     }
 }

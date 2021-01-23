@@ -4,7 +4,7 @@ namespace Scanner\Driver\File;
 
 use Scanner\Driver\Leaf;
 
-class File implements Leaf
+class File extends Component implements Leaf
 {
     private string $path;
 
