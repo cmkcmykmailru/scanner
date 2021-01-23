@@ -2,25 +2,18 @@
 
 namespace Scanner\Driver;
 
-use Scanner\Event\DetectListener;
-use Scanner\Event\LeafListener;
-use Scanner\Event\NodeListener;
+use Scanner\Driver\Parser\Explorer;
+use Scanner\Driver\Parser\NodeFactory;
+use Scanner\Driver\Parser\Parser;
 
 interface Driver
 {
-    public function detect(string $node): void;
 
-    public function addNodeListener(NodeListener $listener): void;
+    public function getExplorer(): Explorer;
 
-    public function addLeafListener(LeafListener $listener): void;
+    public function getParser(): Parser;
 
-    public function addDetectedListener(DetectListener $listener): void;
-
-    public function removeNodeListener(NodeListener $listener): void;
-
-    public function removeLeafListener(LeafListener $listener): void;
-
-    public function removeDetectedListener(DetectListener $listener): void;
+    public function getNodeFactory(): NodeFactory;
 
     public function getNormalizer(): Normalizer;
 
