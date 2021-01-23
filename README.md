@@ -29,19 +29,15 @@ ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 require __DIR__ . '/../vendor/autoload.php';
-
 require 'ExampleListener.php'; //код ниже
 
 use Scanner\Scanner;
 
 $scanner = new Scanner();
-$driver = $scanner->getDriver();
+$listener = new ExampleListener($scanner);
+$scanner->addDetectAdapter($listener);
 
-$listener = new Exampleistener($scanner);
-$driver->addNodeListener($listener);
-$driver->addLeafListener($listener);
-$driver->addDetectedListener($listener);
-
+/** сканируем папку где находимся */
 $scanner->detect(realpath(__DIR__ . '/../src'));
 ```
 
@@ -74,6 +70,7 @@ class ExampleListener extends DetectAdapter
     }
 }
 ```
+
 Введите команду в консоль.
 
 ```
