@@ -4,28 +4,37 @@
 namespace Scanner\Driver\File;
 
 use Scanner\Driver\AbstractDriver;
+use Scanner\Driver\Parser\Explorer;
+use Scanner\Driver\Parser\NodeBuilder;
+use Scanner\Driver\Parser\Parser;
 
 class FileDriver extends AbstractDriver
 {
+    protected PathNodeBuilder $filesNodeBuilder;
+    protected PathParser $pathParser;
 
-    public function detect($path): void
+    /**
+     * FileDriver constructor.
+     */
+    public function __construct()
     {
-        $path = rtrim($path, DIRECTORY_SEPARATOR);
-        $files = array_slice(scandir($path), 2);
-        $pathWithSeparator = $path . DIRECTORY_SEPARATOR;
-
-        $this->fireStartDetected($path);
-
-        foreach ($files as $file) {
-            $filePath = $pathWithSeparator . $file;
-            if (is_dir($filePath)) {
-                $this->fireNodeDetected(new Directory($filePath));
-            } else {
-                $this->fireLeafDetected(new File($filePath));
-            }
-        }
-
-        $this->fireCompleteDetected($path);
+        $this->setNormalizer(new PathNormalizer());
+        $this->filesNodeBuilder = new PathNodeBuilder();
+        $this->pathParser = new PathParser();
     }
 
+    protected function getParser(): Parser
+    {
+        return $this->pathParser;
+    }
+
+    protected function getExplorer(): Explorer
+    {
+        return $this->pathParser;
+    }
+
+    protected function getNodeBuilder(): NodeBuilder
+    {
+        return $this->filesNodeBuilder;
+    }
 }

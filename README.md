@@ -51,7 +51,6 @@ $scanner->detect(realpath(__DIR__ . '/../src'));
 <?php
 
 use Scanner\Event\DetectAdapter;
-use Scanner\Event\DetectEvent;
 use Scanner\Event\NodeEvent;
 use Scanner\Scanner;
 
@@ -71,7 +70,7 @@ class ExampleListener extends DetectAdapter
 
     public function nodeDetected(NodeEvent $evt): void
     {
-        $this->scanner->detect($evt->getNode()->getSource());
+       $this->scanner->getDriver()->detect($evt->getNode()->getSource());
     }
 }
 ```

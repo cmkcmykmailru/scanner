@@ -2,12 +2,57 @@
 
 namespace Scanner\Driver;
 
+use Scanner\Driver\File\Directory;
+use Scanner\Driver\File\File;
+use Scanner\Driver\Parser\Explorer;
+use Scanner\Driver\Parser\NodeBuilder;
+use Scanner\Driver\Parser\Parser;
 use Scanner\Event\DetectListener;
 use Scanner\Event\LeafListener;
 use Scanner\Event\NodeListener;
 
 abstract class AbstractDriver implements Driver
 {
+    protected $normalizer;
+
+    public function detect($detect): void
+    {
+        $this->fireStartDetected($detect);
+
+        $founds = $this->getParser()->parese($detect);
+        $nodeBuilder = $this->getNodeBuilder();
+        $explorer = $this->getExplorer();
+        $explorer->setDetect($detect);
+
+        foreach ($founds as $found) {
+            if ($explorer->isLeaf($found)) {
+                $this->fireLeafDetected($nodeBuilder->buildLeaf($detect, $found));
+            } else {
+                $this->fireNodeDetected($nodeBuilder->buildNode($detect, $found));
+            }
+        }
+
+        $this->fireCompleteDetected($detect);
+    }
+
+    abstract protected function getExplorer(): Explorer;
+
+    abstract protected function getParser(): Parser;
+
+    abstract protected function getNodeBuilder(): NodeBuilder;
+
+    public function setNormalizer(Normalizer $normalizer): void
+    {
+        $this->normalizer = $normalizer;
+    }
+
+    /**
+     * @return Normalizer
+     */
+    public function getNormalizer(): Normalizer
+    {
+        return $this->normalizer;
+    }
 
     public function addNodeListener(NodeListener $listener): void
     {
