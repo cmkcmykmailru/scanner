@@ -41,6 +41,7 @@ $scanner->detect(realpath(__DIR__ . '/../src'));
 
 #### Слушатель может быть таким
 
+В данном случае просто печатает название папок и файлов
 код ExampleListener:
 
 ```php
@@ -51,7 +52,7 @@ use Scanner\Event\DetectEvent;
 use Scanner\Event\NodeEvent;
 use Scanner\Scanner;
 
-class Exampleistener extends DetectAdapter
+class ExampleListener extends DetectAdapter
 {
     private Scanner $scanner;
     private int $count2 = 0;
