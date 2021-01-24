@@ -4,8 +4,9 @@
 namespace Scanner\Driver\File\System;
 
 use Scanner\Driver\File\Component;
+use Scanner\Event\MethodCallListener;
 
-interface Support
+interface Support extends MethodCallListener
 {
     public static function create(Component $component): self;
 

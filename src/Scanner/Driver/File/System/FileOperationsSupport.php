@@ -7,17 +7,17 @@ use Scanner\Driver\File\Component;
 
 interface FileOperationsSupport extends Support
 {
-    public function read(Component $component);
+    public function callRead(Component $component);
 
-    public function write(Component $component);
+    public function callWrite(Component $component);
 
-    public function remove(Component $component): void;
+    public function callRemove(Component $component);
 
-    public function copy(Component $component, string $path): void;
+    public function callCopy(Component $component, string $path);
 
-    public function move(Component $component, string $path): void;
+    public function callMove(Component $component, string $path);
 
-    public function rename(Component $component, string $name): void;
+    public function callRename(Component $component, string $name);
 
-    public function info(Component $component);
+    public function callInfo(Component $component);
 }
