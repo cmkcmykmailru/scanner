@@ -20,6 +20,6 @@
         "phpunit/phpunit": "^10.0@dev"
     },
     "scripts": {
-        "tests": "phpunit --colors=always"
+        "tests": "php ./vendor/bin/phpunit --colors=always tests"
     }
   }

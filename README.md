@@ -120,10 +120,10 @@ $ php example/index.php
 
 В системе есть два интерфейса которые в зависимости от их реализации могут фильтровать инициализацию событий сканера
 
-####Scanner\Filter\LeafFilter
+#### Scanner\Filter\LeafFilter
 
-####public function filterLeaf(Leaf $found): bool;
+#### public function filterLeaf(Leaf $found): bool;
 и
-####Scanner\Filter\NodeFilter
-####public function filterNode(Node $found): bool;
+#### Scanner\Filter\NodeFilter
+#### public function filterNode(Node $found): bool;
 

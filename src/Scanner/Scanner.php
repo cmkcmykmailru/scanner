@@ -63,14 +63,14 @@ class Scanner
         $nodes = [];
         foreach ($founds as $found) {
             if ($explorer->isLeaf($found)) {
-                $leaf = $nodeFactory->createLeaf($detect, $found);
-                if ($this->filterLeaf($leaf)) {
-                    $this->fireLeafDetected($leaf);
+                $leafFound = $nodeFactory->createLeaf($detect, $found);
+                if ($this->filterLeaf($leafFound)) {
+                    $this->fireLeafDetected($leafFound);
                 }
             } else {
-                $node1 = $nodeFactory->createNode($detect, $found);
-                if ($this->filterNode($node1)) {
-                    $nodes[] = $node1;
+                $nodeFound = $nodeFactory->createNode($detect, $found);
+                if ($this->filterNode($nodeFound)) {
+                    $nodes[] = $nodeFound;
                 }
             }
             if ($this->stop) {
