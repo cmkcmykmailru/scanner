@@ -4,7 +4,8 @@
     "license": "MIT",
     "minimum-stability": "dev",
     "require": {
-        "php": ">=7.4"
+        "php": ">=7.4",
+      "ext-http": "*"
     },
     "autoload": {
         "psr-4": {

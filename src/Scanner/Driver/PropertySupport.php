@@ -30,6 +30,10 @@ class PropertySupport
     public function firePropertyEvent($source, string $propName, $oldProp, $newProp): void
     {
         $listeners = $this->storage->getBy($propName);
+        if ($listeners === null) {
+            return;
+        }
+
         $evt = new PropertyEvent($source, $oldProp, $newProp, $propName);
 
         foreach ($listeners as $listener) {

@@ -8,20 +8,18 @@ use Scanner\Driver\File\System\Support;
 
 class Component
 {
-    protected ?Support $support = null;
-
-    protected function setSupport(Support $support): void
+    public function addSupport(Support $support): void
     {
-        $oldProp = $this->support;
-        if ($this->support !== null) {
-            $this->support->uninstall($this);
-            ContextSupport::getPropertySupport($this)->
-            firePropertyEvent($this, 'UNINSTALL_SUPPORT', $oldProp, $support);
-        }
-        $this->support = $support;
-        $this->support->install($this);
-        ContextSupport::getPropertySupport($this)->
-        firePropertyEvent($this, 'INSTALL_SUPPORT', $oldProp, $support);
+        $support->install($this);
     }
 
+    public function removeSupport(Support $support): void
+    {
+        $support->uninstall($this);
+    }
+
+    public function __call($method, $args)
+    {
+        return ContextSupport::getFunctionalitySupport($this)->fireCallEvent($this, $method, $args);
+    }
 }

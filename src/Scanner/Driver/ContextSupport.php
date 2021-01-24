@@ -12,6 +12,7 @@ class ContextSupport
 
     private static ?SplObjectStorage $listenerSupports = null;
     private static ?SplObjectStorage $propertySupports = null;
+    private static ?SplObjectStorage $functionalitySupports = null;
 
     private function __construct()
     {
@@ -40,6 +41,18 @@ class ContextSupport
         }
 
         return self::$propertySupports[$component];
+    }
+
+    public static function getFunctionalitySupport(Component $component): FunctionalitySupport
+    {
+        if (self::$functionalitySupports === null) {
+            self::$functionalitySupports = new SplObjectStorage();
+        }
+        if (!self::$functionalitySupports->contains($component)) {
+            self::$functionalitySupports[$component] = new FunctionalitySupport(new ListenerStorage());
+        }
+
+        return self::$functionalitySupports[$component];
     }
 
     private function __clone()
