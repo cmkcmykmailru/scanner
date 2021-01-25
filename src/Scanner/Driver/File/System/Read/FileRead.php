@@ -1,8 +1,6 @@
 <?php
 
-
-namespace Scanner\Driver\File\System;
-
+namespace Scanner\Driver\File\System\Read;
 
 use Scanner\Driver\Component;
 

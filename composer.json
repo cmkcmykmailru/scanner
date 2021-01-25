@@ -5,7 +5,8 @@
   "minimum-stability": "dev",
   "require": {
     "php": ">=7.4",
-    "psr/container" : "^1.0.0"
+    "psr/container" : "^1.0.0",
+    "ext-yaml": "*"
   },
   "autoload": {
     "psr-4": {

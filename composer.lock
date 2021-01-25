@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "229b436f713c6fc1f80655fee3a8fdc7",
+    "content-hash": "c8885893c264dc32f96798846ace64de",
     "packages": [
         {
             "name": "psr/container",
@@ -846,12 +846,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/code-unit.git",
-                "reference": "40d121b9d37b78d60ebe637cdce0e1087d4eecbc"
+                "reference": "ae3e30af942e2fc0d7b0d055086842c912ffece9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/code-unit/zipball/40d121b9d37b78d60ebe637cdce0e1087d4eecbc",
-                "reference": "40d121b9d37b78d60ebe637cdce0e1087d4eecbc",
+                "url": "https://api.github.com/repos/sebastianbergmann/code-unit/zipball/ae3e30af942e2fc0d7b0d055086842c912ffece9",
+                "reference": "ae3e30af942e2fc0d7b0d055086842c912ffece9",
                 "shasum": ""
             },
             "require": {
@@ -895,7 +895,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-01-23T09:13:11+00:00"
+            "time": "2021-01-25T09:14:33+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
@@ -1822,7 +1822,8 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.4"
+        "php": ">=7.4",
+        "ext-yaml": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "2.0.0"
