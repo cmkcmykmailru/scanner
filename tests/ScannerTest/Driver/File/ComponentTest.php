@@ -2,7 +2,6 @@
 
 namespace ScannerTest\Driver\File;
 
-use Scanner\Driver\File\Component;
 use PHPUnit\Framework\TestCase;
 use Scanner\Driver\File\File;
 

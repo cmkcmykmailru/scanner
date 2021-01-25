@@ -1,10 +1,9 @@
 <?php
 
 
-namespace Scanner\Driver\File;
+namespace Scanner\Driver;
 
-use Scanner\Driver\ContextSupport;
-use Scanner\Driver\File\System\Support;
+use Scanner\Driver\Support\Support;
 
 class Component
 {
@@ -20,6 +19,6 @@ class Component
 
     public function __call($method, $args)
     {
-        return ContextSupport::getFunctionalitySupport($this)->fireCallEvent($this, $method, $args);
+        return ContextSupport::getFunctionalitySupport($this)->fireCallMethodEvent($this, $method, $args);
     }
 }

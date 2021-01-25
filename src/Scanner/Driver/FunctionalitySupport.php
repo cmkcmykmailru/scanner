@@ -31,7 +31,7 @@ class FunctionalitySupport
         $this->storage->remove($listener, $methodName);
     }
 
-    public function fireCallEvent($source, string $methodName, $arguments)
+    public function fireCallMethodEvent($source, string $methodName, $arguments)
     {
         $listeners = $this->storage->getBy($methodName);
         if ($listeners === null) {

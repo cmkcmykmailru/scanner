@@ -1,8 +1,8 @@
 <?php
 
-namespace Scanner\Driver\File\System;
+namespace Scanner\Driver\Support;
 
-use Scanner\Driver\File\Component;
+use Scanner\Driver\Component;
 use Scanner\Event\CallMethodEvent;
 
 abstract class AbstractSupport implements Support

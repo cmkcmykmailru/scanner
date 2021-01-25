@@ -5,9 +5,9 @@ namespace ScannerTest\Driver\File;
 
 
 use Scanner\Driver\ContextSupport;
-use Scanner\Driver\File\Component;
-use Scanner\Driver\File\System\AbstractSupport;
-use Scanner\Driver\File\System\Support;
+use Scanner\Driver\Component;
+use Scanner\Driver\Support\AbstractSupport;
+use Scanner\Driver\Support\Support;
 
 class DummySupport extends AbstractSupport
 {

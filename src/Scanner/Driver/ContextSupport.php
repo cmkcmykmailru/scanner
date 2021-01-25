@@ -3,7 +3,6 @@
 
 namespace Scanner\Driver;
 
-use Scanner\Driver\File\Component;
 use Scanner\Scanner;
 use SplObjectStorage;
 

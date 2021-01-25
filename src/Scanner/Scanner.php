@@ -12,6 +12,8 @@ use Scanner\Event\DetectAdapter;
 use Scanner\Event\DetectListener;
 use Scanner\Event\LeafListener;
 use Scanner\Event\NodeListener;
+use Scanner\Filter\Checker;
+use Scanner\Filter\Filter;
 use Scanner\Filter\LeafFilter;
 use Scanner\Filter\NodeFilter;
 
@@ -25,8 +27,8 @@ class Scanner
      * @var Driver
      */
     private Driver $driver;
-    private ?LeafFilter $leafFilter = null;
-    private ?NodeFilter $NodeFilter = null;
+    private ?Checker $leafChecker = null;
+    private ?Checker $nodeChecker = null;
     private bool $stop = false;
 
     /**
@@ -91,45 +93,45 @@ class Scanner
     }
 
     /**
-     * @return LeafFilter|null
+     * @return Checker|null
      */
-    public function getLeafFilter(): ?LeafFilter
+    public function getLeafChecker(): ?Checker
     {
-        return $this->leafFilter;
+        return $this->leafChecker;
     }
 
     /**
-     * @param LeafFilter|null $leafFilter
+     * @param Checker $leafChecker
      */
-    public function setLeafFilter(LeafFilter $leafFilter): void
+    public function setLeafChecker(Checker $leafChecker): void
     {
-        $this->leafFilter = $leafFilter;
+        $this->leafChecker = $leafChecker;
     }
 
     /**
-     * @return NodeFilter|null
+     * @return Checker|null
      */
-    public function getNodeFilter(): ?NodeFilter
+    public function getNodeChecker(): ?Checker
     {
-        return $this->NodeFilter;
+        return $this->nodeChecker;
     }
 
     /**
-     * @param NodeFilter|null $NodeFilter
+     * @param Checker $nodeChecker
      */
-    public function setNodeFilter(NodeFilter $NodeFilter): void
+    public function setNodeChecker(Checker $nodeChecker): void
     {
-        $this->NodeFilter = $NodeFilter;
+        $this->nodeChecker = $nodeChecker;
     }
 
     private function filterLeaf(Leaf $found): bool
     {
-        return $this->leafFilter ? $this->leafFilter->filterLeaf($found) : true;
+        return $this->leafChecker ? $this->leafChecker->can($found) : true;
     }
 
     private function filterNode(Node $found): bool
     {
-        return $this->NodeFilter ? $this->NodeFilter->filterNode($found) : true;
+        return $this->nodeChecker ? $this->nodeChecker->can($found) : true;
     }
 
     /**

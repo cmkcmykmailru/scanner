@@ -3,7 +3,7 @@
 
 namespace Scanner\Driver\File\System;
 
-use Scanner\Driver\File\Component;
+use Scanner\Driver\Component;
 
 interface FileOperationsSupport extends Support
 {
