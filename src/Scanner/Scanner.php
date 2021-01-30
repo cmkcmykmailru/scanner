@@ -2,44 +2,96 @@
 
 namespace Scanner;
 
+use Laminas\ServiceManager\ServiceManager;
+use Psr\Container\ContainerInterface;
+use Scanner\Driver\Component;
 use Scanner\Driver\ContextSupport;
 use Scanner\Driver\Driver;
-use Scanner\Driver\File\FileDriver;
-use Scanner\Driver\File\PathNodeFactory;
 use Scanner\Driver\Leaf;
 use Scanner\Driver\Node;
+use Scanner\Driver\Search\DefaultSettingsInstaller;
+use Scanner\Driver\Search\SearchSettings;
+use Scanner\Driver\Search\SettingsInstaller;
 use Scanner\Event\DetectAdapter;
 use Scanner\Event\DetectListener;
 use Scanner\Event\LeafListener;
 use Scanner\Event\NodeListener;
-use Scanner\Filter\LeafFilter;
-use Scanner\Filter\NodeFilter;
+use Scanner\Event\PropertyListener;
+use Scanner\Filter\Filter;
+use Scanner\Filter\Verifier;
 
 /**
  * Class Scanner
  * @package Scanner
  */
-class Scanner
+class Scanner extends Component
 {
+    public const SEARCH = 'SEARCH';
+    public const STOP = 'STOP';
+    public const SET_DRIVER = 'SET_DRIVER';
     /**
      * @var Driver
      */
-    private Driver $driver;
-    private ?LeafFilter $leafFilter = null;
-    private ?NodeFilter $NodeFilter = null;
+    private ?Driver $driver = null;
+    private ?Verifier $leafVerifier = null;
+    private ?Verifier $nodeVerifier = null;
     private bool $stop = false;
+    protected ContainerInterface $container;
+    protected ?SearchSettings $searchSettings = null;
+    protected SettingsInstaller $settingsBuilder;
 
     /**
      * Scanner constructor.
-     * @param Driver $driver
+     * @param array $config
+     * @param ContainerInterface|null $container
      */
-    public function __construct(Driver $driver = null)
+    public function __construct(array $config = [], ?ContainerInterface $container = null)
     {
-        if ($driver === null) {
-            $this->driver = new FileDriver(new PathNodeFactory());
+        if ($container === null) {
+            $this->container = $this->createContainer($config);
         } else {
-            $this->driver = $driver;
+            $this->container = $container;
         }
+
+        $this->leafVerifier = new Verifier();
+        $this->nodeVerifier = new Verifier();
+
+        $this->setSettingsBuilder(new DefaultSettingsInstaller($this));
+    }
+
+    protected function createContainer(array $config = []): ContainerInterface
+    {
+        return new ServiceManager($config);
+    }
+
+    /**
+     * @return SettingsInstaller
+     */
+    public function getSettingsBuilder(): SettingsInstaller
+    {
+        return $this->settingsBuilder;
+    }
+
+    /**
+     * @param SettingsInstaller $settingsBuilder
+     */
+    public function setSettingsBuilder(SettingsInstaller $settingsBuilder): void
+    {
+        if (!empty($this->settingsBuilder)) {
+            $this->settingsBuilder->uninstall($this);
+        }
+        $this->settingsBuilder = $settingsBuilder;
+        $this->settingsBuilder->install($this);
+    }
+
+    public function search(SearchSettings $settings)
+    {
+        $oldValue = $this->searchSettings;
+        $this->searchSettings = $settings;
+        $this->firePropertyChange(self::SEARCH, $oldValue, $settings);
+        $detect = $this->searchSettings->getSearchCriteria()['source'];
+        $detect = $this->driver->getNormalizer()->normalise($detect);
+        $this->detect($detect);
     }
 
     /**
@@ -50,7 +102,6 @@ class Scanner
         if ($this->stop) {
             return;
         }
-        $detect = $this->driver->getNormalizer()->normalise($detect);
 
         $this->fireStartDetected($detect);
 
@@ -63,13 +114,17 @@ class Scanner
         $nodes = [];
         foreach ($founds as $found) {
             if ($explorer->isLeaf($found)) {
+
                 $leafFound = $nodeFactory->createLeaf($detect, $found);
-                if ($this->filterLeaf($leafFound)) {
+
+                if ($this->leafVerifier->can($leafFound)) {
                     $this->fireLeafDetected($leafFound);
                 }
             } else {
+
                 $nodeFound = $nodeFactory->createNode($detect, $found);
-                if ($this->filterNode($nodeFound)) {
+
+                if ($this->nodeVerifier->can($nodeFound)) {
                     $nodes[] = $nodeFound;
                 }
             }
@@ -91,45 +146,31 @@ class Scanner
     }
 
     /**
-     * @return LeafFilter|null
+     * @return ContainerInterface
      */
-    public function getLeafFilter(): ?LeafFilter
+    public function getContainer(): ContainerInterface
     {
-        return $this->leafFilter;
+        return $this->container;
     }
 
-    /**
-     * @param LeafFilter|null $leafFilter
-     */
-    public function setLeafFilter(LeafFilter $leafFilter): void
+    public function resetLeafFilters(): void
     {
-        $this->leafFilter = $leafFilter;
+        $this->leafVerifier->clear();
     }
 
-    /**
-     * @return NodeFilter|null
-     */
-    public function getNodeFilter(): ?NodeFilter
+    public function resetNodeFilters(): void
     {
-        return $this->NodeFilter;
+        $this->nodeVerifier->clear();
     }
 
-    /**
-     * @param NodeFilter|null $NodeFilter
-     */
-    public function setNodeFilter(NodeFilter $NodeFilter): void
+    public function addLeafFilter(Filter $filter): void
     {
-        $this->NodeFilter = $NodeFilter;
+        $this->leafVerifier->append($filter);
     }
 
-    private function filterLeaf(Leaf $found): bool
+    public function addNodeFilter(Filter $filter): void
     {
-        return $this->leafFilter ? $this->leafFilter->filterLeaf($found) : true;
-    }
-
-    private function filterNode(Node $found): bool
-    {
-        return $this->NodeFilter ? $this->NodeFilter->filterNode($found) : true;
+        $this->nodeVerifier->append($filter);
     }
 
     /**
@@ -145,7 +186,9 @@ class Scanner
      */
     public function setDriver(Driver $driver): void
     {
+        $oldValue = $this->driver;
         $this->driver = $driver;
+        $this->firePropertyChange(self::SET_DRIVER, $oldValue, $driver);
     }
 
     /**
@@ -153,7 +196,12 @@ class Scanner
      */
     public function stop(bool $stop): void
     {
+        if ($stop === $this->stop) {
+            return;
+        }
+        $oldValue = $this->stop;
         $this->stop = $stop;
+        $this->firePropertyChange(self::STOP, $oldValue, $stop);
     }
 
     /**
@@ -162,6 +210,21 @@ class Scanner
     public function isStop(): bool
     {
         return $this->stop;
+    }
+
+    public function addPropertyListener(PropertyListener $listener, string $propertyName): void
+    {
+        ContextSupport::getPropertySupport($this)->addPropertyChangeListener($listener, $propertyName);
+    }
+
+    public function removePropertyListener(PropertyListener $listener, string $propertyName): void
+    {
+        ContextSupport::getPropertySupport($this)->removePropertyChangeListener($listener, $propertyName);
+    }
+
+    protected function firePropertyChange($propertyName, $oldValue, $newValue): void
+    {
+        ContextSupport::getPropertySupport($this)->firePropertyEvent($this, $propertyName, $oldValue, $newValue);
     }
 
     public function addDetectAdapter(DetectAdapter $adapter): void

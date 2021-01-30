@@ -2,6 +2,7 @@
 
 namespace Scanner\Driver\File;
 
+use Scanner\Driver\Component;
 use Scanner\Driver\Leaf;
 
 class File extends Component implements Leaf

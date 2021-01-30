@@ -2,6 +2,7 @@
 
 namespace Scanner\Driver\File;
 
+use Scanner\Driver\Component;
 use Scanner\Driver\Node;
 
 class Directory extends Component implements Node

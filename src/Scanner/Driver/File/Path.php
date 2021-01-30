@@ -32,7 +32,7 @@ class Path
             $this->parts[$part] = $temp;
             $temp = dirname($temp);
         }
-        $this->parts['/'] = '/';
+        $this->parts[DIRECTORY_SEPARATOR] = DIRECTORY_SEPARATOR;
         $this->parts = array_reverse($this->parts);
     }
 
@@ -70,7 +70,7 @@ class Path
     public function equalsPartOfPath(string $path): bool
     {
         $parts = explode(DIRECTORY_SEPARATOR, trim($path, DIRECTORY_SEPARATOR));
-        array_unshift($parts, "/");
+        array_unshift($parts, DIRECTORY_SEPARATOR);
         if (count($parts) > count($this->parts)) {
             return false;
         }

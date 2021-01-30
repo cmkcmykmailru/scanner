@@ -37,7 +37,7 @@ class PropertySupport
         $evt = new PropertyEvent($source, $oldProp, $newProp, $propName);
 
         foreach ($listeners as $listener) {
-            $listener->firePropertyChange($evt);
+            $listener->propertyChanged($evt);
         }
     }
 

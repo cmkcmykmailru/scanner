@@ -5,9 +5,9 @@ namespace ScannerTest\Driver\File;
 
 
 use Scanner\Driver\ContextSupport;
-use Scanner\Driver\File\Component;
-use Scanner\Driver\File\System\AbstractSupport;
-use Scanner\Driver\File\System\Support;
+use Scanner\Driver\Component;
+use Scanner\Driver\Support\AbstractSupport;
+use Scanner\Driver\Support\Support;
 
 class DummySupport extends AbstractSupport
 {
@@ -45,8 +45,26 @@ class DummySupport extends AbstractSupport
     {
         return 'get2';
     }
+
     public function get3(Component $component)
     {
         return $component->getSource();
+    }
+
+
+    protected function checkArguments($method, $arguments): bool
+    {
+        if ('get1' === $method) {
+            return (count($arguments) === 1 && is_string($arguments[0]));
+        }
+
+        if ('get2' === $method) {
+            return empty($arguments);
+        }
+
+        if ('get3' === $method) {
+            return empty($arguments);
+        }
+        return false;
     }
 }

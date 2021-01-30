@@ -1,9 +1,8 @@
 <?php
 
+namespace Scanner\Driver\Support;
 
-namespace Scanner\Driver\File\System;
-
-use Scanner\Driver\File\Component;
+use Scanner\Driver\Component;
 use Scanner\Event\MethodCallListener;
 
 interface Support extends MethodCallListener
