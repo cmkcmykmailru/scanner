@@ -6,10 +6,10 @@ use PHPUnit\Framework\TestCase;
 use Scanner\Driver\File\File;
 use Scanner\Driver\File\System\Read\ReadSupport;
 use Scanner\Driver\File\System\Read\Strategy\YamlReadStrategy;
+use Scanner\Exception\NotSupportedArgumentException;
 
 class ReadSupportTest extends TestCase
 {
-
 
     public function testRead()
     {
@@ -29,8 +29,25 @@ class ReadSupportTest extends TestCase
         $support2 = ReadSupport::create($file);
 
         $newSupport = new ReadSupport();
-        self::assertEquals($support, $support2);
-        self::assertNotEquals($newSupport, $support2);
+
+        self::assertSame($support, $support2);
+        self::assertNotSame($newSupport, $support2);
     }
 
+    public function testExcepAruments()
+    {
+        $this->expectException(NotSupportedArgumentException::class);
+
+        $file = new File(__DIR__ . '/test.yml');
+        $file->addSupport(ReadSupport::create($file));
+        $file->read('exception');
+    }
+
+    public function testAruments()
+    {
+        $file = new File(__DIR__ . '/test.yml');
+        $file->addSupport(ReadSupport::create($file));
+
+        self::assertIsArray($file->read());
+    }
 }

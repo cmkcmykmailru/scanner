@@ -31,12 +31,23 @@ ini_set('display_startup_errors', 1);
 require __DIR__ . '/../vendor/autoload.php';
 require 'ExampleListener.php';
 
+use Scanner\Driver\File\FilesSearchSettings;
+use Scanner\Driver\File\System\Read\ReadSupport;
 use Scanner\Scanner;
 
-$scanner = new Scanner();
-$scanner->addDetectAdapter(new ExampleListener($scanner));
 
-$scanner->detect(realpath(__DIR__ . '/../src'));
+$scanner = new Scanner();
+$listener = new ExampleListener($scanner); //код ниже
+$scanner->addDetectAdapter($listener);
+
+$path = realpath(__DIR__ . '/../tests');
+
+$settings = new FilesSearchSettings();
+$settings->search(['ALL', 'source' => $path])
+    ->filter(['FILE' => ['extension' => 'yml']])
+    ->support(['FILE' => [ReadSupport::class]]);
+
+$scanner->search($settings);
 ```
 
 #### Слушатель может быть таким
@@ -55,7 +66,7 @@ use Scanner\Scanner;
 class ExampleListener extends DetectAdapter
 {
     private Scanner $scanner;
-    private int $count2 = 0;
+    private int $counter = 0;
     private $nodes = [];
 
     public function __construct(Scanner $scanner)
@@ -65,9 +76,7 @@ class ExampleListener extends DetectAdapter
 
     public function detectStarted(DetectEvent $evt): void
     {
-        $this->printOffset($evt->getDetect());
-        $this->count2++;
-        echo basename($evt->getDetect()) . '/' . PHP_EOL;
+        $this->counter++;
     }
 
     public function detectCompleted(DetectEvent $evt): void
@@ -88,8 +97,13 @@ class ExampleListener extends DetectAdapter
      */
     public function leafDetected(NodeEvent $evt): void
     {
-        $this->printOffset($evt->getNode()->getSource());
+        echo 'Найден файл: ' ;
         echo basename($evt->getNode()->getSource()) . PHP_EOL;
+        $yml = $evt->getNode()->read();
+
+        echo 'Содержит:' . PHP_EOL;
+        print_r($yml);
+        echo '====================================' . PHP_EOL;
     }
 
     /**
@@ -98,21 +112,9 @@ class ExampleListener extends DetectAdapter
      */
     public function nodeDetected(NodeEvent $evt): void
     {
-        $this->nodes[$this->count2][] = $evt->getNode();
+        $this->nodes[$this->counter][] = $evt->getNode();
     }
 
-    private function printOffset(string $path): void
-    {
-        $arr = explode(DIRECTORY_SEPARATOR, $path);
-        if (!$arr) {
-            return;
-        }
-
-        $c = count($arr);
-        for ($i = 0; $i < $c; $i++) {
-            echo '-';
-        }
-    }
 }
 ```
 
@@ -124,53 +126,28 @@ $ php example/index.php
 
 вывод
 ```php
------src/
-------Scanner/
--------Scanner.php
--------Driver/
---------ContextSupport.php
---------Driver.php
---------FunctionalitySupport.php
---------Leaf.php
---------ListenerStorage.php
---------ListenerSupport.php
---------Node.php
---------Normalizer.php
---------PropertySupport.php
---------File/
----------Component.php
----------Directory.php
----------File.php
----------FileDriver.php
----------Path.php
----------PathNodeFactory.php
----------PathNormalizer.php
----------PathParser.php
----------System/
-----------AbstractSupport.php
-----------FileOperationsSupport.php
-----------Support.php
---------Parser/
----------Explorer.php
----------NodeFactory.php
----------Parser.php
--------Event/
---------AbstractEvent.php
---------CallMethodEvent.php
---------DetectAdapter.php
---------DetectEvent.php
---------DetectListener.php
---------Event.php
---------LeafListener.php
---------Listener.php
---------MethodCallListener.php
---------NodeEvent.php
---------NodeListener.php
---------PropertyEvent.php
---------PropertyListener.php
--------Filter/
---------LeafFilter.php
---------NodeFilter.php
+Найден файл: test.yml
+Содержит:
+Array
+(
+    [version] => 45
+)
+====================================
+Найден файл: test2.yml
+Содержит:
+Array
+(
+    [version] => 70
+)
+====================================
+Найден файл: test.yml
+Содержит:
+Array
+(
+    [version] => 3.2
+)
+====================================
+
 ```
 
 Сканер можно остановить вызвав метод $this->scanner->stop(true);
@@ -181,4 +158,9 @@ $ php example/index.php
 В системе есть два интерфейса которые в зависимости от их реализации могут фильтровать инициализацию событий сканера
 
 Документация будет, когда проект будет завершен.
+
+### Тестировать 
+```
+composer tests
+```
 

@@ -10,6 +10,6 @@ class DummyTargetHandle implements TargetHandle
 
     public function handle(Component $component): void
     {
-        echo 'target';
+        echo $component->getSource();
     }
 }

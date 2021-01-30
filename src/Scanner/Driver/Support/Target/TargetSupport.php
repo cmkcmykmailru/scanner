@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Scanner\Driver\Support\Target;
-
 
 use Scanner\Driver\Component;
 use Scanner\Driver\ContextSupport;
@@ -13,6 +11,11 @@ class TargetSupport extends AbstractSupport
 {
     private static ?TargetSupport $self = null;
     private TargetHandle $handle;
+
+    protected function checkArguments($method, $arguments): bool
+    {
+        return empty($arguments);
+    }
 
     protected function installMethods(Component $component): void
     {
@@ -53,4 +56,5 @@ class TargetSupport extends AbstractSupport
     {
         $this->handle->handle($component);
     }
+
 }

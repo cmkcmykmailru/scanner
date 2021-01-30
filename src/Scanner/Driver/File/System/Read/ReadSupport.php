@@ -5,6 +5,7 @@ namespace Scanner\Driver\File\System\Read;
 use Scanner\Driver\Component;
 use Scanner\Driver\ContextSupport;
 use Scanner\Driver\File\System\Read\Strategy\ReadStrategy;
+use Scanner\Driver\File\System\Read\Strategy\YamlReadStrategy;
 use Scanner\Driver\Support\AbstractSupport;
 use Scanner\Driver\Support\Support;
 
@@ -13,6 +14,19 @@ class ReadSupport extends AbstractSupport implements FileRead
 
     private static $self = null;
     private ReadStrategy $readStrategy;
+
+    /**
+     * ReadSupport constructor.
+     */
+    public function __construct()
+    {
+        $this->readStrategy = new YamlReadStrategy();
+    }
+
+    protected function checkArguments($method, $arguments): bool
+    {
+        return empty($arguments);
+    }
 
     protected function installMethods(Component $component): void
     {

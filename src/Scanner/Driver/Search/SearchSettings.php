@@ -1,8 +1,8 @@
 <?php
 
-
 namespace Scanner\Driver\Search;
 
+use Scanner\Driver\Driver;
 
 interface SearchSettings
 {
@@ -16,5 +16,15 @@ interface SearchSettings
 
     public function support(array $parameters): SearchSettings;
 
-    public function visit($client): void;
+    public function getSearchCriteria(): ?array;
+
+    public function getFilter(): ?array;
+
+    public function getStrategy(): ?array;
+
+    public function getHandle(): ?array;
+
+    public function getSupport(): ?array;
+
+    public function getDriver(): Driver;
 }

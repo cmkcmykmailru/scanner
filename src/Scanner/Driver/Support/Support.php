@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Scanner\Driver\Support;
 
 use Scanner\Driver\Component;

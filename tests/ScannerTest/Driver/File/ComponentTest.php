@@ -30,7 +30,10 @@ class ComponentTest extends TestCase
 
     public function testSupportMethodsCalled()
     {
-        $file = new File(__DIR__ . '/test.yml');
+        $path = __DIR__ . '/test.yml';
+        $path2 = __DIR__ . '/test2.yml';
+        $file = new File($path);
+        $file2 = new File($path2);
         $readSupport = ReadSupport::create($file);
         $readSupport->setReadStrategy(new YamlReadStrategy());
 
@@ -41,14 +44,27 @@ class ComponentTest extends TestCase
         $file->addSupport($readSupport);
         $file->addSupport($targetSupport);
 
+        $file2->addSupport($readSupport);
+        $file2->addSupport($targetSupport);
+
         $yml = $file->read();
         ob_start();
         $file->target();
         $out = ob_get_clean();
 
+        $yml2 = $file2->read();
+        ob_start();
+        $file2->target();
+        $out2 = ob_get_clean();
+
         self::assertIsArray($yml);
         self::assertArrayHasKey('version', $yml);
         self::assertEquals('45', $yml['version']);
-        self::assertEquals('target', $out);
+        self::assertEquals($path, $out);
+
+        self::assertIsArray($yml2);
+        self::assertArrayHasKey('version', $yml2);
+        self::assertEquals('70', $yml2['version']);
+        self::assertEquals($path2, $out2);
     }
 }

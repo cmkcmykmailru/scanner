@@ -14,9 +14,11 @@ class BaseChecker extends AbstractChecker
      * BaseChecker constructor.
      * @param Filter $filter
      */
-    public function __construct(Filter $filter)
+    public function __construct(?Filter $filter = null)
     {
-        $this->filter = $filter;
+        if ($filter !== null) {
+            $this->filter = $filter;
+        }
     }
 
     public function can(Node $node): bool

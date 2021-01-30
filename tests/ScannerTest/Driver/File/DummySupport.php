@@ -45,8 +45,26 @@ class DummySupport extends AbstractSupport
     {
         return 'get2';
     }
+
     public function get3(Component $component)
     {
         return $component->getSource();
+    }
+
+
+    protected function checkArguments($method, $arguments): bool
+    {
+        if ('get1' === $method) {
+            return (count($arguments) === 1 && is_string($arguments[0]));
+        }
+
+        if ('get2' === $method) {
+            return empty($arguments);
+        }
+
+        if ('get3' === $method) {
+            return empty($arguments);
+        }
+        return false;
     }
 }
