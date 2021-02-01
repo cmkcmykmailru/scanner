@@ -10,39 +10,35 @@ use Scanner\Event\MethodCallListener;
 class FunctionalitySupport
 {
 
-    private ListenerStorage $storage;
-
-    public function __construct(ListenerStorage $storage)
-    {
-        $this->storage = $storage;
-    }
+    private array $storage = [];
 
     public function addMethodCallListener(MethodCallListener $listener, string $methodName): void
     {
-        $listeners = $this->storage->getBy($methodName);
-        if ($listeners !== null) {
+        if (array_key_exists($methodName, $this->storage)) {
             throw new RuntimeException('Too many method listeners of - ' . $methodName);
         }
-        $this->storage->add($listener, $methodName);
+
+        $this->storage[$methodName] = $listener;
     }
 
-    public function removeMethodCallListener(MethodCallListener $listener, string $methodName): void
+    public function removeMethodCallListener(string $methodName): void
     {
-        $this->storage->remove($listener, $methodName);
+        unset($this->storage[$methodName]);
     }
 
     public function fireCallMethodEvent($source, string $methodName, $arguments)
     {
-        $listeners = $this->storage->getBy($methodName);
-        if ($listeners === null) {
+        if (!isset($this->storage[$methodName])) {
             throw new BadMethodCallException('Calling unknown method ' . get_class($source) . '::' . $methodName . '(...))');
         }
-        if (count($listeners) > 1) {
-            throw new RuntimeException('Too many method listeners.');
-        }
-        $evt = new CallMethodEvent($source, $methodName, $arguments);
 
-        return $listeners[0]->methodCalled($evt);
+        $evt = new CallMethodEvent($source, $methodName, $arguments);
+        $listener = $this->storage[$methodName];
+        return $listener->methodCalled($evt);
     }
 
+    public function clear(): void
+    {
+        $storage = [];
+    }
 }

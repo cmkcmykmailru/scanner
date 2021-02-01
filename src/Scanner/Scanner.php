@@ -7,18 +7,15 @@ use Psr\Container\ContainerInterface;
 use Scanner\Driver\Component;
 use Scanner\Driver\ContextSupport;
 use Scanner\Driver\Driver;
-use Scanner\Driver\Leaf;
-use Scanner\Driver\Node;
 use Scanner\Driver\Search\DefaultSettingsInstaller;
 use Scanner\Driver\Search\SearchSettings;
 use Scanner\Driver\Search\SettingsInstaller;
-use Scanner\Event\DetectAdapter;
-use Scanner\Event\DetectListener;
-use Scanner\Event\LeafListener;
-use Scanner\Event\NodeListener;
 use Scanner\Event\PropertyListener;
 use Scanner\Filter\Filter;
 use Scanner\Filter\Verifier;
+use Scanner\Strategy\AbstractScanStrategy;
+use Scanner\Strategy\BreadthTraversalScanStrategy;
+use Scanner\Strategy\ScanVisitor;
 
 /**
  * Class Scanner
@@ -29,6 +26,7 @@ class Scanner extends Component
     public const SEARCH = 'SEARCH';
     public const STOP = 'STOP';
     public const SET_DRIVER = 'SET_DRIVER';
+    public const TRAVERSAL_VISITOR = 'TRAVERSAL_VISITOR';
     /**
      * @var Driver
      */
@@ -38,7 +36,9 @@ class Scanner extends Component
     private bool $stop = false;
     protected ContainerInterface $container;
     protected ?SearchSettings $searchSettings = null;
-    protected SettingsInstaller $settingsBuilder;
+    protected SettingsInstaller $settingsInstaller;
+    protected ?ScanVisitor $visitor = null;
+    protected AbstractScanStrategy $traversal;
 
     /**
      * Scanner constructor.
@@ -56,7 +56,8 @@ class Scanner extends Component
         $this->leafVerifier = new Verifier();
         $this->nodeVerifier = new Verifier();
 
-        $this->setSettingsBuilder(new DefaultSettingsInstaller($this));
+        $this->setSettingsInstaller(new DefaultSettingsInstaller($this));
+        $this->traversal = $this->getScanStrategy();
     }
 
     protected function createContainer(array $config = []): ContainerInterface
@@ -67,21 +68,21 @@ class Scanner extends Component
     /**
      * @return SettingsInstaller
      */
-    public function getSettingsBuilder(): SettingsInstaller
+    public function getSettingsInstaller(): SettingsInstaller
     {
-        return $this->settingsBuilder;
+        return $this->settingsInstaller;
     }
 
     /**
-     * @param SettingsInstaller $settingsBuilder
+     * @param SettingsInstaller $settingsInstaller
      */
-    public function setSettingsBuilder(SettingsInstaller $settingsBuilder): void
+    public function setSettingsInstaller(SettingsInstaller $settingsInstaller): void
     {
-        if (!empty($this->settingsBuilder)) {
-            $this->settingsBuilder->uninstall($this);
+        if (!empty($this->settingsInstaller)) {
+            $this->settingsInstaller->uninstall($this);
         }
-        $this->settingsBuilder = $settingsBuilder;
-        $this->settingsBuilder->install($this);
+        $this->settingsInstaller = $settingsInstaller;
+        $this->settingsInstaller->install($this);
     }
 
     public function search(SearchSettings $settings)
@@ -90,7 +91,7 @@ class Scanner extends Component
         $this->searchSettings = $settings;
         $this->firePropertyChange(self::SEARCH, $oldValue, $settings);
         $detect = $this->searchSettings->getSearchCriteria()['source'];
-        $detect = $this->driver->getNormalizer()->normalise($detect);
+
         $this->detect($detect);
     }
 
@@ -99,50 +100,28 @@ class Scanner extends Component
      */
     public function detect($detect): void
     {
-        if ($this->stop) {
-            return;
+        if ($this->visitor === null) {
+            throw new \RuntimeException('TraversalVisitor is not installed.');
         }
+        $detect = $this->driver->getNormalizer()->normalise($detect);
+        $this->traversal->detect($detect, $this->driver, $this->leafVerifier, $this->nodeVerifier);
+    }
 
-        $this->fireStartDetected($detect);
+    protected function getScanStrategy(): AbstractScanStrategy
+    {
+        return new BreadthTraversalScanStrategy($this);
+    }
 
-        $founds = $this->driver->getParser()->parese($detect);
+    public function setScanVisitor(ScanVisitor $visitor): void
+    {
+        $oldValue = $this->visitor;
+        $this->visitor = $visitor;
+        $this->firePropertyChange(self::TRAVERSAL_VISITOR, $oldValue, $visitor);
+    }
 
-        $nodeFactory = $this->driver->getNodeFactory();
-        $explorer = $this->driver->getExplorer();
-        $explorer->setDetect($detect);
-
-        $nodes = [];
-        foreach ($founds as $found) {
-            if ($explorer->isLeaf($found)) {
-
-                $leafFound = $nodeFactory->createLeaf($detect, $found);
-
-                if ($this->leafVerifier->can($leafFound)) {
-                    $this->fireLeafDetected($leafFound);
-                }
-            } else {
-
-                $nodeFound = $nodeFactory->createNode($detect, $found);
-
-                if ($this->nodeVerifier->can($nodeFound)) {
-                    $nodes[] = $nodeFound;
-                }
-            }
-            if ($this->stop) {
-                $this->fireCompleteDetected($detect);
-                return;
-            }
-        }
-
-        foreach ($nodes as $node) {
-            $this->fireNodeDetected($node);
-            if ($this->stop) {
-                $this->fireCompleteDetected($detect);
-                return;
-            }
-        }
-
-        $this->fireCompleteDetected($detect);
+    public function getScanVisitor(): ?ScanVisitor
+    {
+        return $this->visitor;
     }
 
     /**
@@ -225,63 +204,6 @@ class Scanner extends Component
     protected function firePropertyChange($propertyName, $oldValue, $newValue): void
     {
         ContextSupport::getPropertySupport($this)->firePropertyEvent($this, $propertyName, $oldValue, $newValue);
-    }
-
-    public function addDetectAdapter(DetectAdapter $adapter): void
-    {
-        $this->addNodeListener($adapter);
-        $this->addLeafListener($adapter);
-        $this->addDetectedListener($adapter);
-    }
-
-    public function addNodeListener(NodeListener $listener): void
-    {
-        ContextSupport::getSupport($this)->addNodeListener($listener);
-    }
-
-    public function addLeafListener(LeafListener $listener): void
-    {
-        ContextSupport::getSupport($this)->addLeafListener($listener);
-    }
-
-    public function addDetectedListener(DetectListener $listener): void
-    {
-        ContextSupport::getSupport($this)->addDetectedListener($listener);
-    }
-
-    public function removeNodeListener(NodeListener $listener): void
-    {
-        ContextSupport::getSupport($this)->removeNodeListener($listener);
-    }
-
-    public function removeLeafListener(LeafListener $listener): void
-    {
-        ContextSupport::getSupport($this)->removeLeafListener($listener);
-    }
-
-    public function removeDetectedListener(DetectListener $listener): void
-    {
-        ContextSupport::getSupport($this)->removeDetectedListener($listener);
-    }
-
-    protected function fireLeafDetected(Leaf $leaf): void
-    {
-        ContextSupport::getSupport($this)->fireLeafDetected($this, $leaf);
-    }
-
-    protected function fireNodeDetected(Node $node): void
-    {
-        ContextSupport::getSupport($this)->fireNodeDetected($this, $node);
-    }
-
-    protected function fireStartDetected(string $detect): void
-    {
-        ContextSupport::getSupport($this)->fireStartDetected($this, $detect);
-    }
-
-    protected function fireCompleteDetected(string $detect): void
-    {
-        ContextSupport::getSupport($this)->fireCompleteDetected($this, $detect);
     }
 
 }

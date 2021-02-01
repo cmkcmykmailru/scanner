@@ -29,16 +29,15 @@ ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 require __DIR__ . '/../vendor/autoload.php';
-require 'ExampleListener.php';
+require 'Visitor.php';
 
 use Scanner\Driver\File\FilesSearchSettings;
 use Scanner\Driver\File\System\Read\ReadSupport;
 use Scanner\Scanner;
 
-
 $scanner = new Scanner();
-$listener = new ExampleListener($scanner); //код ниже
-$scanner->addDetectAdapter($listener);
+$visitor = new Visitor();
+$scanner->setScanVisitor($visitor);
 
 $path = realpath(__DIR__ . '/../tests');
 
@@ -48,51 +47,30 @@ $settings->search(['ALL', 'source' => $path])
     ->support(['FILE' => [ReadSupport::class]]);
 
 $scanner->search($settings);
+
 ```
 
 #### Слушатель может быть таким
 
-В данном случае просто печатает название папок и файлов
-код ExampleListener:
+В данном случае просто ищет файлы с раcширением yml читает и печатает содержимое.
+код Visitor:
 
 ```php
 <?php
 
-use Scanner\Event\DetectAdapter;
+use Scanner\Strategy\ScanVisitor;
 use Scanner\Event\DetectEvent;
 use Scanner\Event\NodeEvent;
-use Scanner\Scanner;
 
-class ExampleListener extends DetectAdapter
+class Visitor implements ScanVisitor
 {
-    private Scanner $scanner;
-    private int $counter = 0;
-    private $nodes = [];
 
-    public function __construct(Scanner $scanner)
-    {
-        $this->scanner = $scanner;
-    }
+    public function detectStarted(DetectEvent $evt): void {}
 
-    public function detectStarted(DetectEvent $evt): void
-    {
-        $this->counter++;
-    }
-
-    public function detectCompleted(DetectEvent $evt): void
-    {
-        $arr = array_shift($this->nodes);
-
-        if ($arr === null) {
-            return;
-        }
-        foreach ($arr as $node) {
-            $this->scanner->detect($node->getSource());
-        }
-    }
+    public function detectCompleted(DetectEvent $evt): void {}
 
     /**
-     * определил файл
+     * определил лист
      * @param NodeEvent $evt
      */
     public function leafDetected(NodeEvent $evt): void
@@ -107,13 +85,10 @@ class ExampleListener extends DetectAdapter
     }
 
     /**
-     * определил папку
+     * определил ноду
      * @param NodeEvent $evt
      */
-    public function nodeDetected(NodeEvent $evt): void
-    {
-        $this->nodes[$this->counter][] = $evt->getNode();
-    }
+    public function nodeDetected(NodeEvent $evt): void {}
 
 }
 ```

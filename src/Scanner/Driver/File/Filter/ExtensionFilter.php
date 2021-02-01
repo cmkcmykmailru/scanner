@@ -21,6 +21,7 @@ class ExtensionFilter implements Filter
     public function filter(Node $node): bool
     {
         $pathInfo = pathinfo($node->getSource());
+        if (!isset($pathInfo['extension'])) return false;
         return $this->filterSetting === $pathInfo['extension'];
     }
 }

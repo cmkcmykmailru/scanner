@@ -1,11 +1,15 @@
 <?php
 
 
-namespace Scanner\Event;
+namespace ScannerTest\Driver;
 
+use Scanner\Event\DetectEvent;
+use Scanner\Event\NodeEvent;
+use Scanner\Strategy\ScanVisitor;
 
-class DetectAdapter implements DetectListener, LeafListener, NodeListener
+class DummyVisitor implements  ScanVisitor
 {
+
 
     public function detectStarted(DetectEvent $evt): void
     {

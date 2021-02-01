@@ -4,7 +4,9 @@ namespace ScannerTest\Driver;
 
 use PHPUnit\Framework\TestCase;
 use Scanner\Driver\ListenerStorage;
-use Scanner\Driver\ListenerSupport;
+use Scanner\Driver\PropertySupport;
+use Scanner\Scanner;
+
 
 class ListenerStorageTest extends TestCase
 {
@@ -13,13 +15,13 @@ class ListenerStorageTest extends TestCase
     {
         $storage = new ListenerStorage();
 
-        $listener1 = new DummyListener();
-        $listener2 = new DummyListener();
-        $listener3 = new DummyListener();
-        $listener4 = new DummyListener();
+        $listener1 = new DummyPropertyListener();
+        $listener2 = new DummyPropertyListener();
+        $listener3 = new DummyPropertyListener();
+        $listener4 = new DummyPropertyListener();
 
-        $type1 = ListenerSupport::TYPE_NODE;
-        $type2 = ListenerSupport::TYPE_LEAF;
+        $type1 = Scanner::SET_DRIVER;
+        $type2 = Scanner::TRAVERSAL_VISITOR;
 
         $storage->add($listener1, $type1);
         $storage->add($listener2, $type1);
@@ -51,8 +53,8 @@ class ListenerStorageTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $listener = new DummyListener();
-        $type = ListenerSupport::TYPE_NODE;
+        $listener = new DummyPropertyListener();
+        $type = Scanner::SET_DRIVER;
 
         $storage = new ListenerStorage();
         $storage->add($listener, $type);
@@ -63,13 +65,13 @@ class ListenerStorageTest extends TestCase
     {
         $storage = new ListenerStorage();
 
-        $listener1 = new DummyListener();
-        $listener2 = new DummyListener();
-        $listener3 = new DummyListener();
-        $listener4 = new DummyListener();
+        $listener1 = new DummyPropertyListener();
+        $listener2 = new DummyPropertyListener();
+        $listener3 = new DummyPropertyListener();
+        $listener4 = new DummyPropertyListener();
 
-        $type1 = ListenerSupport::TYPE_NODE;
-        $type2 = ListenerSupport::TYPE_LEAF;
+        $type1 = Scanner::SET_DRIVER;
+        $type2 = Scanner::TRAVERSAL_VISITOR;
 
         $storage->add($listener1, $type1);
         $storage->add($listener2, $type1);
@@ -105,11 +107,11 @@ class ListenerStorageTest extends TestCase
 
         $storage = new ListenerStorage();
 
-        $listener1 = new DummyListener();
-        $listener2 = new DummyListener();
+        $listener1 = new DummyPropertyListener();
+        $listener2 = new DummyPropertyListener();
 
-        $type1 = ListenerSupport::TYPE_NODE;
-        $type2 = ListenerSupport::TYPE_LEAF;
+        $type1 = Scanner::SET_DRIVER;
+        $type2 = Scanner::TRAVERSAL_VISITOR;
 
         $storage->add($listener1, $type1);
         $storage->add($listener2, $type2);
@@ -120,11 +122,11 @@ class ListenerStorageTest extends TestCase
     {
         $storage = new ListenerStorage();
 
-        $listener1 = new DummyListener();
-        $listener2 = new DummyListener();
+        $listener1 = new DummyPropertyListener();
+        $listener2 = new DummyPropertyListener();
 
-        $type1 = ListenerSupport::TYPE_NODE;
-        $type2 = ListenerSupport::TYPE_LEAF;
+        $type1 = Scanner::SET_DRIVER;
+        $type2 = Scanner::TRAVERSAL_VISITOR;
 
         $storage->add($listener1, $type1);
         $storage->add($listener2, $type2);
@@ -139,11 +141,11 @@ class ListenerStorageTest extends TestCase
     {
         $storage = new ListenerStorage();
 
-        $listener1 = new DummyListener();
-        $listener2 = new DummyListener();
+        $listener1 = new DummyPropertyListener();
+        $listener2 = new DummyPropertyListener();
 
-        $type1 = ListenerSupport::TYPE_NODE;
-        $type2 = ListenerSupport::TYPE_LEAF;
+        $type1 = Scanner::SET_DRIVER;
+        $type2 = Scanner::TRAVERSAL_VISITOR;
 
         $storage->add($listener1, $type1);
         $storage->add($listener2, $type2);
@@ -174,13 +176,13 @@ class ListenerStorageTest extends TestCase
     {
         $storage = new ListenerStorage();
 
-        $listener1 = new DummyListener();
-        $listener2 = new DummyListener();
-        $listener3 = new DummyListener();
-        $listener4 = new DummyListener();
+        $listener1 = new DummyPropertyListener();
+        $listener2 = new DummyPropertyListener();
+        $listener3 = new DummyPropertyListener();
+        $listener4 = new DummyPropertyListener();
 
-        $type1 = ListenerSupport::TYPE_NODE;
-        $type2 = ListenerSupport::TYPE_LEAF;
+        $type1 = Scanner::SET_DRIVER;
+        $type2 = Scanner::TRAVERSAL_VISITOR;
 
         $storage->add($listener1, $type1);
         $storage->add($listener2, $type1);
