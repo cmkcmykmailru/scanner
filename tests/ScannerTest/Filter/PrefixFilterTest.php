@@ -24,6 +24,13 @@ class PrefixFilterTest extends TestCase
             ->willReturn('var' . DIRECTORY_SEPARATOR . 'FileName.php');
 
         self::assertEquals(false, $prefixFilter->filter($badNode));
+
+
+        $badNode = $this->createMock(Node::class);
+        $badNode->method('getSource')
+            ->willReturn('var' . DIRECTORY_SEPARATOR . '.php');
+
+        self::assertEquals(false, $prefixFilter->filter($badNode));
     }
 
 }

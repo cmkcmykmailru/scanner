@@ -24,5 +24,17 @@ class ExtensionFilterTest extends TestCase
             ->willReturn('var' . DIRECTORY_SEPARATOR . 'FileName.csv');
 
         self::assertEquals(false, $extensionFilter->filter($badNode));
+
+        $badNode = $this->createMock(Node::class);
+        $badNode->method('getSource')
+            ->willReturn('var' . DIRECTORY_SEPARATOR . 'FileName');
+
+        self::assertEquals(false, $extensionFilter->filter($badNode));
+
+        $badNode = $this->createMock(Node::class);
+        $badNode->method('getSource')
+            ->willReturn('var' . DIRECTORY_SEPARATOR . '.h');
+
+        self::assertEquals(false, $extensionFilter->filter($badNode));
     }
 }

@@ -22,6 +22,11 @@ class Component
         return ContextSupport::getFunctionalitySupport($this)->fireCallMethodEvent($this, $method, $args);
     }
 
+    public function __destruct()
+    {
+        ContextSupport::removeFunctionalitySupport($this);
+    }
+
     public function equals(Component $component): bool
     {
         return $this === $component;
