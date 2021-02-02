@@ -22,4 +22,8 @@ class Directory extends Component implements Node
         return $this->path;
     }
 
+    protected function setData($data): void
+    {
+        $this->path = $data;
+    }
 }

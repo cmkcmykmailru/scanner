@@ -2,16 +2,16 @@
 
 namespace Scanner\Strategy;
 
-use Scanner\Event\DetectEvent;
-use Scanner\Event\NodeEvent;
+use Scanner\Driver\Leaf;
+use Scanner\Driver\Node;
 
 interface ScanVisitor
 {
-    public function detectStarted(DetectEvent $evt): void;
+    public function detectStarted(AbstractScanStrategy $scanStrategy, $detect): void;
 
-    public function detectCompleted(DetectEvent $evt): void;
+    public function detectCompleted(AbstractScanStrategy $scanStrategy, $detect): void;
 
-    public function leafDetected(NodeEvent $event): void;
+    public function leafDetected(AbstractScanStrategy $scanStrategy, Leaf $leaf): void;
 
-    public function nodeDetected(NodeEvent $event): void;
+    public function nodeDetected(AbstractScanStrategy $scanStrategy, Node $node): void;
 }

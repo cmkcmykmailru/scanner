@@ -26,7 +26,7 @@ class BreadthTraversalScanStrategy extends AbstractScanStrategy
             $founds = $driver->getParser()->parese($node);
             $explorer->setDetect($node);
 
-            foreach ($founds as $found) {
+            foreach ($founds as $key => $found) {
                 if ($this->stop) {
                     $this->fireCompleteDetected($node);
                     return;

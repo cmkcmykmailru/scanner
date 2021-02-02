@@ -3,7 +3,6 @@
 
 namespace Scanner\Driver;
 
-use Scanner\Scanner;
 use SplObjectStorage;
 
 class ContextSupport
