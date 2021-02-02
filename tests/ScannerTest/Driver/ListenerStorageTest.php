@@ -21,7 +21,7 @@ class ListenerStorageTest extends TestCase
         $listener4 = new DummyPropertyListener();
 
         $type1 = Scanner::SET_DRIVER;
-        $type2 = Scanner::TRAVERSAL_VISITOR;
+        $type2 = Scanner::SCAN_VISITOR;
 
         $storage->add($listener1, $type1);
         $storage->add($listener2, $type1);
@@ -71,7 +71,7 @@ class ListenerStorageTest extends TestCase
         $listener4 = new DummyPropertyListener();
 
         $type1 = Scanner::SET_DRIVER;
-        $type2 = Scanner::TRAVERSAL_VISITOR;
+        $type2 = Scanner::SCAN_VISITOR;
 
         $storage->add($listener1, $type1);
         $storage->add($listener2, $type1);
@@ -111,7 +111,7 @@ class ListenerStorageTest extends TestCase
         $listener2 = new DummyPropertyListener();
 
         $type1 = Scanner::SET_DRIVER;
-        $type2 = Scanner::TRAVERSAL_VISITOR;
+        $type2 = Scanner::SCAN_VISITOR;
 
         $storage->add($listener1, $type1);
         $storage->add($listener2, $type2);
@@ -126,7 +126,7 @@ class ListenerStorageTest extends TestCase
         $listener2 = new DummyPropertyListener();
 
         $type1 = Scanner::SET_DRIVER;
-        $type2 = Scanner::TRAVERSAL_VISITOR;
+        $type2 = Scanner::SCAN_VISITOR;
 
         $storage->add($listener1, $type1);
         $storage->add($listener2, $type2);
@@ -145,7 +145,7 @@ class ListenerStorageTest extends TestCase
         $listener2 = new DummyPropertyListener();
 
         $type1 = Scanner::SET_DRIVER;
-        $type2 = Scanner::TRAVERSAL_VISITOR;
+        $type2 = Scanner::SCAN_VISITOR;
 
         $storage->add($listener1, $type1);
         $storage->add($listener2, $type2);
@@ -182,7 +182,7 @@ class ListenerStorageTest extends TestCase
         $listener4 = new DummyPropertyListener();
 
         $type1 = Scanner::SET_DRIVER;
-        $type2 = Scanner::TRAVERSAL_VISITOR;
+        $type2 = Scanner::SCAN_VISITOR;
 
         $storage->add($listener1, $type1);
         $storage->add($listener2, $type1);

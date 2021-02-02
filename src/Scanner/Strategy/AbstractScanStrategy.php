@@ -4,20 +4,18 @@ namespace Scanner\Strategy;
 
 use Scanner\Driver\Leaf;
 use Scanner\Driver\Node;
-use Scanner\Event\DetectEvent;
-use Scanner\Event\NodeEvent;
 use Scanner\Scanner;
 
 abstract class AbstractScanStrategy
 {
     protected bool $stop = false;
-    protected Scanner $scanner;
+    protected ?Scanner $scanner;
 
     /**
-     * DefaultTraversal constructor.
+     *
      * @param Scanner $scanner
      */
-    public function __construct(Scanner $scanner)
+    public function installScanner(Scanner $scanner): void
     {
         $this->scanner = $scanner;
     }
@@ -42,26 +40,22 @@ abstract class AbstractScanStrategy
 
     protected function fireLeafDetected(Leaf $leaf): void
     {
-        $evt = new NodeEvent($this, $leaf, NodeEvent::LEAF_DETECTED);
-        $this->scanner->getScanVisitor()->leafDetected($evt);
+        $this->scanner->getScanVisitor()->leafDetected($this, $leaf);
     }
 
     protected function fireNodeDetected(Node $node): void
     {
-        $evt = new NodeEvent($this, $node, NodeEvent::NODE_DETECTED);
-        $this->scanner->getScanVisitor()->nodeDetected($evt);
+        $this->scanner->getScanVisitor()->nodeDetected($this, $node);
     }
 
     protected function fireStartDetected(string $detect): void
     {
-        $evt = new DetectEvent($this, $detect, DetectEvent::START_DETECTED);
-        $this->scanner->getScanVisitor()->detectStarted($evt);
+        $this->scanner->getScanVisitor()->detectStarted($this, $detect);
     }
 
     protected function fireCompleteDetected(string $detect): void
     {
-        $evt = new DetectEvent($this, $detect, DetectEvent::END_DETECTED);
-        $this->scanner->getScanVisitor()->detectCompleted($evt);
+        $this->scanner->getScanVisitor()->detectCompleted($this, $detect);
     }
 
 }

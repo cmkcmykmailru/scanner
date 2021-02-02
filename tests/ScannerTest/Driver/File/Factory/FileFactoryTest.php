@@ -4,6 +4,7 @@ namespace ScannerTest\Driver\File\Factory;
 
 use PHPUnit\Framework\TestCase;
 use ReflectionObject;
+use Scanner\Driver\ContextSupport;
 use Scanner\Driver\File\Directory;
 use Scanner\Driver\File\File;
 use Scanner\Driver\File\FileFactory;
@@ -24,25 +25,38 @@ class FileFactoryTest extends TestCase
 
         $reflection = new ReflectionObject($fileFactory);
 
-        $fileSupports = $reflection->getProperty('fileSupports');
-        $fileSupports->setAccessible(true);
-        $fileSupportsValue = $fileSupports->getValue($fileFactory);
+        $filePrototype = $reflection->getProperty('filePrototype');
+        $filePrototype->setAccessible(true);
+        $filePrototypeValue = $filePrototype->getValue($fileFactory);
 
-        self::assertIsArray($fileSupportsValue);
-        self::assertContains(ReadSupport::class, $fileSupportsValue);
+        self::assertEquals(File::class, get_class($filePrototypeValue));
 
-        $directorySupports = $reflection->getProperty('directorySupports');
-        $directorySupports->setAccessible(true);
-        $directorySupportsValue = $directorySupports->getValue($fileFactory);
+        $support = ContextSupport::getFunctionalitySupport($filePrototypeValue);
 
-        self::assertIsArray($directorySupportsValue);
-        self::assertContains(DummySupport::class, $directorySupportsValue);
+        $reflectionSupport = new ReflectionObject($support);
+        $storageProp = $reflectionSupport->getProperty('storage');
+        $storageProp->setAccessible(true);
+        $storage = $storageProp->getValue($support);
+        $sup = ReadSupport::create($filePrototypeValue);
+        self::assertContains($sup, $storage);
 
-        self::assertNotContains(DummySupport::class, $fileSupportsValue);
-        self::assertNotContains(ReadSupport::class, $directorySupportsValue);
+        self::assertCount(1, $storage);//1 method ReadSupport
 
-        self::assertCount(1, $fileSupportsValue);
-        self::assertCount(1, $directorySupportsValue);
+        $directoryProperty = $reflection->getProperty('directoryPrototype');
+        $directoryProperty->setAccessible(true);
+        $directoryPrototype = $directoryProperty->getValue($fileFactory);
+
+        $dirSupport = ContextSupport::getFunctionalitySupport($directoryPrototype);
+
+        $reflectionSupport = new ReflectionObject($dirSupport);
+        $storageProp = $reflectionSupport->getProperty('storage');
+        $storageProp->setAccessible(true);
+        $storage = $storageProp->getValue($dirSupport);
+        $sup = DummySupport::create($directoryPrototype);
+
+        self::assertContains($sup, $storage);
+        self::assertCount(3, $storage);//3 methods DummySupport
+
     }
 
     public function testCreateLeaf()
@@ -60,6 +74,30 @@ class FileFactoryTest extends TestCase
         $fileFactory->needSupportsOf($supportSetting);
         $file2 = $fileFactory->createLeaf($detect, $fileName);
         self::assertEquals('dummy', $file2->get1('dummy'));
+
+
+        $file2Support = ContextSupport::getFunctionalitySupport($file2);
+
+        $reflectionSupport = new ReflectionObject($file2Support);
+        $storageProp = $reflectionSupport->getProperty('storage');
+        $storageProp->setAccessible(true);
+        $storageFile2 = $storageProp->getValue($file2Support);
+
+
+        $reflection = new ReflectionObject($fileFactory);
+
+        $fileProperty = $reflection->getProperty('filePrototype');
+        $fileProperty->setAccessible(true);
+        $filePrototype = $fileProperty->getValue($fileFactory);
+        $filePrototypeSupport = ContextSupport::getFunctionalitySupport($filePrototype);
+
+        $reflectionFilePrototypeSupport = new ReflectionObject($filePrototypeSupport);
+        $filePrototypeStorageProp = $reflectionFilePrototypeSupport->getProperty('storage');
+        $filePrototypeStorageProp->setAccessible(true);
+        $storageFilePrototype = $filePrototypeStorageProp->getValue($filePrototypeSupport);
+
+        self::assertEquals($storageFile2, $storageFilePrototype);
+
     }
 
     public function testCreateNode()
@@ -77,5 +115,27 @@ class FileFactoryTest extends TestCase
         $fileFactory->needSupportsOf($supportSetting);
         $directory2 = $fileFactory->createNode($detect, $directoryName);
         self::assertEquals('dummy', $directory2->get1('dummy'));
+
+
+        $directory2Support = ContextSupport::getFunctionalitySupport($directory2);
+
+        $reflectionSupport = new ReflectionObject($directory2Support);
+        $storageProp = $reflectionSupport->getProperty('storage');
+        $storageProp->setAccessible(true);
+        $storageDirectory2 = $storageProp->getValue($directory2Support);
+
+        $reflection = new ReflectionObject($fileFactory);
+
+        $directoryPrototypeProperty = $reflection->getProperty('directoryPrototype');
+        $directoryPrototypeProperty->setAccessible(true);
+        $directoryPrototype = $directoryPrototypeProperty->getValue($fileFactory);
+        $directoryPrototypeSupport = ContextSupport::getFunctionalitySupport($directoryPrototype);
+
+        $reflectionDirectoryPrototypeSupport = new ReflectionObject($directoryPrototypeSupport);
+        $directoryPrototypeStorageProp = $reflectionDirectoryPrototypeSupport->getProperty('storage');
+        $directoryPrototypeStorageProp->setAccessible(true);
+        $storageDirectoryPrototype = $directoryPrototypeStorageProp->getValue($directoryPrototypeSupport);
+
+        self::assertEquals($storageDirectory2, $storageDirectoryPrototype);
     }
 }

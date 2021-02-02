@@ -30,12 +30,12 @@ class ReadSupport extends AbstractSupport implements FileRead
 
     protected function installMethods(Component $component): void
     {
-        ContextSupport::getFunctionalitySupport($component)->addMethodCallListener($this, 'read');
+        ContextSupport::getFunctionalitySupport($component)->installMethod($this, 'read');
     }
 
     protected function uninstallMethods(Component $component): void
     {
-        ContextSupport::getFunctionalitySupport($component)->removeMethodCallListener($this, 'read');
+        ContextSupport::getFunctionalitySupport($component)->uninstallMethod( 'read');
     }
 
     public static function create(Component $component): Support

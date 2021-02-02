@@ -22,4 +22,9 @@ class File extends Component implements Leaf
     {
         return $this->path;
     }
+
+    protected function setData($data): void
+    {
+        $this->path = $data;
+    }
 }

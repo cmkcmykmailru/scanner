@@ -19,12 +19,12 @@ class TargetSupport extends AbstractSupport
 
     protected function installMethods(Component $component): void
     {
-        ContextSupport::getFunctionalitySupport($component)->addMethodCallListener($this, 'target');
+        ContextSupport::getFunctionalitySupport($component)->installMethod($this, 'target');
     }
 
     protected function uninstallMethods(Component $component): void
     {
-        ContextSupport::getFunctionalitySupport($component)->removeMethodCallListener($this, 'target');
+        ContextSupport::getFunctionalitySupport($component)->uninstallMethod('target');
     }
 
     public static function create(Component $component): Support

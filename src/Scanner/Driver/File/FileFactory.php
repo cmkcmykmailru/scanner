@@ -8,38 +8,41 @@ use Scanner\Driver\Parser\NodeFactory;
 
 class FileFactory implements NodeFactory
 {
-    private array $directorySupports = [];
-    private array $fileSupports = [];
+    private File $filePrototype;
+    private Directory $directoryPrototype;
+
+    /**
+     * FileFactory constructor.
+     */
+    public function __construct()
+    {
+        $this->filePrototype = new File('');
+        $this->directoryPrototype = new Directory('');
+    }
 
     public function createNode($detect, $found): Node
     {
-        $directory = new Directory($detect . DIRECTORY_SEPARATOR . $found);
-
-        foreach ($this->directorySupports as $support) {
-            $directory->addSupport($support::create($directory));
-        }
-
-        return $directory;
+        return $this->directoryPrototype->cloneWithData($detect . DIRECTORY_SEPARATOR . $found);
     }
 
     public function createLeaf($detect, $found): Leaf
     {
-        $file = new File($detect . DIRECTORY_SEPARATOR . $found);
-
-        foreach ($this->fileSupports as $support) {
-            $file->addSupport($support::create($file));
-        }
-
-        return $file;
+        return $this->filePrototype->cloneWithData($detect . DIRECTORY_SEPARATOR . $found);
     }
 
     public function needSupportsOf(array $supports): void
     {
         if (isset($supports['FILE'])) {
-            $this->fileSupports = $supports['FILE'];
+            $fileSupports = $supports['FILE'];
+            foreach ($fileSupports as $key => $support) {
+                $this->filePrototype->addSupport($support::create($this->filePrototype));
+            }
         }
         if (isset($supports['DIRECTORY'])) {
-            $this->directorySupports = $supports['DIRECTORY'];
+            $directorySupports = $supports['DIRECTORY'];
+            foreach ($directorySupports as $key => $support) {
+                $this->directoryPrototype->addSupport($support::create($this->directoryPrototype));
+            }
         }
     }
 }

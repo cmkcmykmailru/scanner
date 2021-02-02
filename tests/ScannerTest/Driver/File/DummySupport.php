@@ -15,16 +15,16 @@ class DummySupport extends AbstractSupport
 
     protected function installMethods(Component $component): void
     {
-        ContextSupport::getFunctionalitySupport($component)->addMethodCallListener($this, 'get1');
-        ContextSupport::getFunctionalitySupport($component)->addMethodCallListener($this, 'get2');
-        ContextSupport::getFunctionalitySupport($component)->addMethodCallListener($this, 'get3');
+        ContextSupport::getFunctionalitySupport($component)->installMethod($this, 'get1');
+        ContextSupport::getFunctionalitySupport($component)->installMethod($this, 'get2');
+        ContextSupport::getFunctionalitySupport($component)->installMethod($this, 'get3');
     }
 
     protected function uninstallMethods(Component $component): void
     {
-        ContextSupport::getFunctionalitySupport($component)->removeMethodCallListener($this, 'get1');
-        ContextSupport::getFunctionalitySupport($component)->removeMethodCallListener($this, 'get2');
-        ContextSupport::getFunctionalitySupport($component)->removeMethodCallListener($this, 'get3');
+        ContextSupport::getFunctionalitySupport($component)->uninstallMethod($this, 'get1');
+        ContextSupport::getFunctionalitySupport($component)->uninstallMethod($this, 'get2');
+        ContextSupport::getFunctionalitySupport($component)->uninstallMethod($this, 'get3');
     }
 
     public static function create(Component $component): Support

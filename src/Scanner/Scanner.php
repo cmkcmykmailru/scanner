@@ -11,6 +11,7 @@ use Scanner\Driver\Search\DefaultSettingsInstaller;
 use Scanner\Driver\Search\SearchSettings;
 use Scanner\Driver\Search\SettingsInstaller;
 use Scanner\Event\PropertyListener;
+use Scanner\Exception\SearchConfigurationException;
 use Scanner\Filter\Filter;
 use Scanner\Filter\Verifier;
 use Scanner\Strategy\AbstractScanStrategy;
@@ -24,16 +25,14 @@ use Scanner\Strategy\ScanVisitor;
 class Scanner extends Component
 {
     public const SEARCH = 'SEARCH';
-    public const STOP = 'STOP';
     public const SET_DRIVER = 'SET_DRIVER';
-    public const TRAVERSAL_VISITOR = 'TRAVERSAL_VISITOR';
+    public const SCAN_VISITOR = 'SCAN_VISITOR';
     /**
      * @var Driver
      */
     private ?Driver $driver = null;
-    private ?Verifier $leafVerifier = null;
-    private ?Verifier $nodeVerifier = null;
-    private bool $stop = false;
+    private Verifier $leafVerifier;
+    private Verifier $nodeVerifier;
     protected ContainerInterface $container;
     protected ?SearchSettings $searchSettings = null;
     protected SettingsInstaller $settingsInstaller;
@@ -57,7 +56,7 @@ class Scanner extends Component
         $this->nodeVerifier = new Verifier();
 
         $this->setSettingsInstaller(new DefaultSettingsInstaller($this));
-        $this->traversal = $this->getScanStrategy();
+        $this->traversal = $this->initialScanStrategy();
     }
 
     protected function createContainer(array $config = []): ContainerInterface
@@ -85,41 +84,55 @@ class Scanner extends Component
         $this->settingsInstaller->install($this);
     }
 
-    public function search(SearchSettings $settings)
+    public function search(SearchSettings $settings): void
     {
         $oldValue = $this->searchSettings;
         $this->searchSettings = $settings;
         $this->firePropertyChange(self::SEARCH, $oldValue, $settings);
-        $detect = $this->searchSettings->getSearchCriteria()['source'];
+        $criteria = $this->searchSettings->getSearchCriteria();
 
-        $this->detect($detect);
+        if (!isset($criteria['source'])) {
+            throw new SearchConfigurationException('Parameter "source" is not found.');
+        }
+
+        $this->detect($criteria['source']);
     }
 
     /**
      * @param $detect
      */
-    public function detect($detect): void
+    protected function detect($detect): void
     {
-        if ($this->visitor === null) {
-            throw new \RuntimeException('TraversalVisitor is not installed.');
+        if ($this->visitor === null && $this->container->has(ScanVisitor::class)) {
+            $visitor = $this->container->get(ScanVisitor::class);
+            $this->setScanVisitor($visitor);
+        } else if ($this->visitor === null) {
+            throw new \RuntimeException('ScanVisitor is not installed.');
         }
         $detect = $this->driver->getNormalizer()->normalise($detect);
         $this->traversal->detect($detect, $this->driver, $this->leafVerifier, $this->nodeVerifier);
     }
 
-    protected function getScanStrategy(): AbstractScanStrategy
+    protected function initialScanStrategy(): AbstractScanStrategy
     {
-        return new BreadthTraversalScanStrategy($this);
+        if ($this->container->has(AbstractScanStrategy::class)) {
+            $scanStrategy = $this->container->get(AbstractScanStrategy::class);
+            $scanStrategy->installScanner($this);
+            return $scanStrategy;
+        }
+        $scanStrategy = new BreadthTraversalScanStrategy();
+        $scanStrategy->installScanner($this);
+        return $scanStrategy;
     }
 
     public function setScanVisitor(ScanVisitor $visitor): void
     {
         $oldValue = $this->visitor;
         $this->visitor = $visitor;
-        $this->firePropertyChange(self::TRAVERSAL_VISITOR, $oldValue, $visitor);
+        $this->firePropertyChange(self::SCAN_VISITOR, $oldValue, $visitor);
     }
 
-    public function getScanVisitor(): ?ScanVisitor
+    public function getScanVisitor(): ScanVisitor
     {
         return $this->visitor;
     }
@@ -175,12 +188,10 @@ class Scanner extends Component
      */
     public function stop(bool $stop): void
     {
-        if ($stop === $this->stop) {
+        if ($stop === $this->traversal->isStop()) {
             return;
         }
-        $oldValue = $this->stop;
-        $this->stop = $stop;
-        $this->firePropertyChange(self::STOP, $oldValue, $stop);
+        $this->traversal->setStop($stop);
     }
 
     /**
@@ -188,7 +199,7 @@ class Scanner extends Component
      */
     public function isStop(): bool
     {
-        return $this->stop;
+        return $this->traversal->isStop();
     }
 
     public function addPropertyListener(PropertyListener $listener, string $propertyName): void
