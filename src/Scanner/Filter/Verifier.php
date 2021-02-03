@@ -21,12 +21,12 @@ class Verifier
         return $this;
     }
 
-    public function can(Node $node): bool
+    public function can($found): bool
     {
         if (empty($this->initialChecker)) {
             return true;
         }
-        return $this->initialChecker->can($node);
+        return $this->initialChecker->can($found);
     }
 
     public function clear()

@@ -4,7 +4,6 @@ namespace ScannerTest\Filter;
 
 use PHPUnit\Framework\TestCase;
 use Scanner\Driver\File\File;
-use Scanner\Driver\Node;
 use Scanner\Filter\BaseChecker;
 use Scanner\Filter\Filter;
 
@@ -14,30 +13,30 @@ class BaseCheckerTest extends TestCase
     public function testCan()
     {
         $call1 = new class() implements Filter {
-            public function filter(Node $node): bool
+            public function filter($node): bool
             {
-                $pathInfo = pathinfo($node->getSource());
+                $pathInfo = pathinfo($node);
                 return 'php' === $pathInfo['extension'];
             }
         };
 
         $call2 = new class() implements Filter {
-            public function filter(Node $node): bool
+            public function filter($node): bool
             {
-                $sub = substr($node->getSource(), 0, 4);
+                $sub = substr($node, 0, 4);
                 return $sub === 'conf';
             }
         };
 
         $call3 = new class() implements Filter {
-            public function filter(Node $node): bool
+            public function filter($node): bool
             {
-                return $node->getSource() === 'conftest1.php';
+                return $node === 'conftest1.php';
             }
         };
 
-        $coolFile = new File('conftest1.php');
-        $badFile = new File('conftest1.yml');
+        $coolFile = 'conftest1.php';
+        $badFile = 'conftest1.yml';
 
         $check = new BaseChecker($call1);
 
@@ -48,7 +47,7 @@ class BaseCheckerTest extends TestCase
 
         $check2 = new BaseChecker($call1);
         $check2->append(new BaseChecker($call2));
-        $coolFile2 = new File('conf_tedsghdghdfgh.php');
+        $coolFile2 ='conf_tedsghdghdfgh.php';
 
         self::assertEquals(true, $check2->can($coolFile));
         self::assertEquals(false, $check2->can($badFile));

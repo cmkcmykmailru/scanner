@@ -24,18 +24,13 @@ class SingleScanStrategy extends AbstractScanStrategy
                 return;
             }
             if ($explorer->isLeaf($found)) {
-                $leafFound = $nodeFactory->createLeaf($detect, $found);
-
-                if ($leafVerifier->can($leafFound)) {
-                    $this->fireLeafDetected($leafFound);
+                if ($leafVerifier->can($explorer->next())) {
+                    $this->fireLeafDetected($nodeFactory, $detect, $found);
                 }
             } else {
-                $nodeFound = $nodeFactory->createNode($detect, $found);
-
-                if ($nodeVerifier->can($nodeFound)) {
-                    $this->fireNodeDetected($nodeFound);
+                if ($nodeVerifier->can($explorer->next())) {
+                    $this->fireNodeDetected($nodeFactory, $detect, $found);
                 }
-
             }
         }
 

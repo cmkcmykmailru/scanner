@@ -21,7 +21,7 @@ class BaseChecker extends AbstractChecker
         }
     }
 
-    public function can(Node $node): bool
+    public function can($node): bool
     {
         return $this->filter->filter($node) ? parent::can($node) : false;
     }

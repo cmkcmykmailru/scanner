@@ -4,6 +4,7 @@ namespace Scanner\Strategy;
 
 use Scanner\Driver\Leaf;
 use Scanner\Driver\Node;
+use Scanner\Driver\Parser\NodeFactory;
 use Scanner\Scanner;
 
 abstract class AbstractScanStrategy
@@ -38,14 +39,14 @@ abstract class AbstractScanStrategy
         $this->stop = $stop;
     }
 
-    protected function fireLeafDetected(Leaf $leaf): void
+    protected function fireLeafDetected(NodeFactory $factory, $detect, $found): void
     {
-        $this->scanner->getScanVisitor()->leafDetected($this, $leaf);
+        $this->scanner->getScanVisitor()->leafDetected($this, $factory, $detect, $found);
     }
 
-    protected function fireNodeDetected(Node $node): void
+    protected function fireNodeDetected(NodeFactory $factory, $detect, $found): void
     {
-        $this->scanner->getScanVisitor()->nodeDetected($this, $node);
+        $this->scanner->getScanVisitor()->nodeDetected($this, $factory, $detect, $found);
     }
 
     protected function fireStartDetected(string $detect): void

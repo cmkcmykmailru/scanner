@@ -8,6 +8,7 @@ use Scanner\Driver\Parser\Parser;
 class PathParser implements Parser, Explorer
 {
     private $detect;
+    private $next;
 
     public function parese($source): array
     {
@@ -21,6 +22,12 @@ class PathParser implements Parser, Explorer
 
     public function isLeaf($found): bool
     {
-        return !is_dir($this->detect . $found);
+        $this->next = $this->detect . $found;
+        return !is_dir($this->next);
+    }
+
+    public function next()
+    {
+        return $this->next;
     }
 }

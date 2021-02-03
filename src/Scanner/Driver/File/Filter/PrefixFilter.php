@@ -2,7 +2,6 @@
 
 namespace Scanner\Driver\File\Filter;
 
-use Scanner\Driver\Node;
 use Scanner\Filter\Filter;
 
 class PrefixFilter implements Filter
@@ -18,9 +17,9 @@ class PrefixFilter implements Filter
         $this->filterSetting = $filterSetting;
     }
 
-    public function filter(Node $node): bool
+    public function filter($node): bool
     {
-        $sub = substr(basename($node->getSource()), 0, mb_strlen($this->filterSetting));
+        $sub = substr(basename($node), 0, mb_strlen($this->filterSetting));
         return $sub === $this->filterSetting;
     }
 }

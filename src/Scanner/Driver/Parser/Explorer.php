@@ -9,4 +9,6 @@ interface Explorer
     public function setDetect($detect): void;
 
     public function isLeaf($found): bool;
+
+    public function next();
 }

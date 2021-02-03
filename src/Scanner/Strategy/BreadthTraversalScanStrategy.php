@@ -2,6 +2,7 @@
 
 namespace Scanner\Strategy;
 
+use Scanner\Driver\Parser\Explorer;
 use SplQueue;
 
 class BreadthTraversalScanStrategy extends AbstractScanStrategy
@@ -19,11 +20,14 @@ class BreadthTraversalScanStrategy extends AbstractScanStrategy
 
         $nodeFactory = $driver->getNodeFactory();
         $explorer = $driver->getExplorer();
+        $parser = $driver->getParser();
         $cnode = null;
 
         while ($queue->count() > 0) {
             $cnode = $node = $queue->dequeue();
-            $founds = $driver->getParser()->parese($node);
+            $founds = $parser->parese($node);
+
+            /** @var Explorer $explorer */
             $explorer->setDetect($node);
 
             foreach ($founds as $key => $found) {
@@ -32,18 +36,14 @@ class BreadthTraversalScanStrategy extends AbstractScanStrategy
                     return;
                 }
                 if ($explorer->isLeaf($found)) {
-                    $leafFound = $nodeFactory->createLeaf($node, $found);
-
-                    if ($leafVerifier->can($leafFound)) {
-                        $this->fireLeafDetected($leafFound);
+                    if ($leafVerifier->can($explorer->next())) {
+                        $this->fireLeafDetected($nodeFactory, $node, $found);
                     }
                 } else {
-                    $nodeFound = $nodeFactory->createNode($node, $found);
-
-                    if ($nodeVerifier->can($nodeFound)) {
-                        $this->fireNodeDetected($nodeFound);
+                    if ($nodeVerifier->can($explorer->next())) {
+                        $this->fireNodeDetected($nodeFactory, $node, $found);
                     }
-                    $queue->enqueue($nodeFound->getSource());
+                    $queue->enqueue($explorer->next());
                 }
             }
         }

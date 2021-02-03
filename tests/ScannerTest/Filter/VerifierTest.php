@@ -15,19 +15,19 @@ class VerifierTest extends TestCase
     {
         $verifier = new Verifier();
         $verifier->append(new class() implements Filter {
-            public function filter(Node $node): bool
+            public function filter($node): bool
             {
                 $pathInfo = pathinfo($node->getSource());
                 return 'php' === $pathInfo['extension'];
             }
         })->append(new class() implements Filter {
-            public function filter(Node $node): bool
+            public function filter($node): bool
             {
                 $sub = substr($node->getSource(), 0, 4);
                 return $sub === 'conf';
             }
         })->append(new class() implements Filter {
-            public function filter(Node $node): bool
+            public function filter($node): bool
             {
                 return $node->getSource() === 'conftest1.php';
             }
@@ -43,13 +43,13 @@ class VerifierTest extends TestCase
 
         $verifier2 = new Verifier();
         $verifier2->append(new class() implements Filter {
-            public function filter(Node $node): bool
+            public function filter($node): bool
             {
                 $pathInfo = pathinfo($node->getSource());
                 return 'php' === $pathInfo['extension'];
             }
         })->append(new class() implements Filter {
-            public function filter(Node $node): bool
+            public function filter($node): bool
             {
                 $sub = substr($node->getSource(), 0, 4);
                 return $sub === 'conf';

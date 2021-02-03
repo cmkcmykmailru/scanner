@@ -2,7 +2,6 @@
 
 namespace Scanner\Driver\File\Filter;
 
-use Scanner\Driver\Node;
 use Scanner\Filter\Filter;
 
 class ExtensionFilter implements Filter
@@ -18,9 +17,9 @@ class ExtensionFilter implements Filter
         $this->filterSetting = $filterSetting;
     }
 
-    public function filter(Node $node): bool
+    public function filter($node): bool
     {
-        $pathInfo = pathinfo($node->getSource());
+        $pathInfo = pathinfo($node);
         if (!isset($pathInfo['extension'])) return false;
         return $this->filterSetting === $pathInfo['extension'];
     }
