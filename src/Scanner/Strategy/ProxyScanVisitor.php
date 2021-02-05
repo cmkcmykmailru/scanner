@@ -67,4 +67,33 @@ class ProxyScanVisitor implements ScanVisitor
             $scanStrategy->setStop(!$this->scanner->isNodeMultiTarget());
         }
     }
+
+    public function clear()
+    {
+        $this->leafHandler = null;
+        $this->nodeHandler = null;
+        $this->realVisitor = null;
+        $this->scanner = null;
+    }
+
+    public function update(
+        Scanner $scanner,
+        ?TargetHandler $leafHandler,
+        ?TargetHandler $nodeHandler
+    ): void
+    {
+        $this->leafHandler = $leafHandler;
+        $this->nodeHandler = $nodeHandler;
+        $this->scanner = $scanner;
+    }
+
+    public function extract(): ScanVisitor
+    {
+        return $this->realVisitor;
+    }
+
+    public function __destruct()
+    {
+        $this->clear();
+    }
 }

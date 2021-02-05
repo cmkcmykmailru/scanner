@@ -27,7 +27,6 @@ class Scanner extends Component
     public const SEARCH = 'SEARCH';
     public const SET_DRIVER = 'SET_DRIVER';
     public const SCAN_VISITOR = 'SCAN_VISITOR';
-    public const PROXY_SCAN_VISITOR = 'PROXY_SCAN_VISITOR';
     public const LEAF_MULTI_TARGET = 'LEAF_MULTI_TARGET';
     public const NODE_MULTI_TARGET = 'NODE_MULTI_TARGET';
     public const SCAN_STRATEGY = 'SCAN_STRATEGY';
@@ -178,12 +177,12 @@ class Scanner extends Component
 
     public function setScanVisitor(ScanVisitor $visitor): void
     {
-        $oldValue = $this->visitor;
-        $this->visitor = $visitor;
-        if ($visitor instanceof ProxyScanVisitor) {
-            $this->firePropertyChange(self::PROXY_SCAN_VISITOR, $oldValue, $visitor);
+        if ($this->visitor === $visitor) {
             return;
         }
+        $oldValue = $this->visitor;
+        $this->visitor = $visitor;
+
         $this->firePropertyChange(self::SCAN_VISITOR, $oldValue, $visitor);
     }
 

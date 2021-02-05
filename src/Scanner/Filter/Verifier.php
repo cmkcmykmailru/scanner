@@ -1,10 +1,6 @@
 <?php
 
-
 namespace Scanner\Filter;
-
-
-use Scanner\Driver\Node;
 
 class Verifier
 {

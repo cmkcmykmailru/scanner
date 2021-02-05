@@ -61,5 +61,8 @@ abstract class AbstractScanStrategy
     {
         $this->scanner->getScanVisitor()->scanCompleted($this, $detect);
     }
-
+    public function __destruct()
+    {
+        $this->uninstallScanner();
+    }
 }
