@@ -2,16 +2,15 @@
 
 namespace Scanner\Strategy;
 
-use Scanner\Driver\Leaf;
-use Scanner\Driver\Node;
+use Scanner\Driver\Parser\NodeFactory;
 
 interface ScanVisitor
 {
-    public function detectStarted(AbstractScanStrategy $scanStrategy, $detect): void;
+    public function scanStarted(AbstractScanStrategy $scanStrategy, $detect): void;
 
-    public function detectCompleted(AbstractScanStrategy $scanStrategy, $detect): void;
+    public function scanCompleted(AbstractScanStrategy $scanStrategy, $detect): void;
 
-    public function leafDetected(AbstractScanStrategy $scanStrategy, Leaf $leaf): void;
+    public function visitLeaf(AbstractScanStrategy $scanStrategy, NodeFactory $factory, $detect, $found, $data = null): void;
 
-    public function nodeDetected(AbstractScanStrategy $scanStrategy, Node $node): void;
+    public function visitNode(AbstractScanStrategy $scanStrategy, NodeFactory $factory, $detect, $found, $data = null): void;
 }

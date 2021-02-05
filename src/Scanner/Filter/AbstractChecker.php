@@ -2,8 +2,6 @@
 
 namespace Scanner\Filter;
 
-use Scanner\Driver\Node;
-
 abstract class AbstractChecker implements Checker
 {
     protected ?Checker $next = null;
@@ -14,9 +12,9 @@ abstract class AbstractChecker implements Checker
         return $checker;
     }
 
-    public function can(Node $node): bool
+    public function can($node): bool
     {
-        if ($this->next != null) {
+        if ($this->next !== null) {
             return $this->next->can($node);
         }
         return true;

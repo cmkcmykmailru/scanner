@@ -2,8 +2,7 @@
 
 namespace Scanner\Strategy;
 
-use Scanner\Driver\Leaf;
-use Scanner\Driver\Node;
+use Scanner\Driver\Parser\NodeFactory;
 use Scanner\Scanner;
 
 abstract class AbstractScanStrategy
@@ -18,6 +17,11 @@ abstract class AbstractScanStrategy
     public function installScanner(Scanner $scanner): void
     {
         $this->scanner = $scanner;
+    }
+
+    public function uninstallScanner(): void
+    {
+        $this->scanner = null;
     }
 
     abstract public function detect($detect, $driver, $leafVerifier, $nodeVerifier): void;
@@ -38,24 +42,24 @@ abstract class AbstractScanStrategy
         $this->stop = $stop;
     }
 
-    protected function fireLeafDetected(Leaf $leaf): void
+    protected function fireVisitLeaf(NodeFactory $factory, $detect, $found): void
     {
-        $this->scanner->getScanVisitor()->leafDetected($this, $leaf);
+        $this->scanner->getScanVisitor()->visitLeaf($this, $factory, $detect, $found);
     }
 
-    protected function fireNodeDetected(Node $node): void
+    protected function fireVisitNode(NodeFactory $factory, $detect, $found): void
     {
-        $this->scanner->getScanVisitor()->nodeDetected($this, $node);
+        $this->scanner->getScanVisitor()->visitNode($this, $factory, $detect, $found);
     }
 
-    protected function fireStartDetected(string $detect): void
+    protected function fireScanStarted(string $detect): void
     {
-        $this->scanner->getScanVisitor()->detectStarted($this, $detect);
+        $this->scanner->getScanVisitor()->scanStarted($this, $detect);
     }
 
-    protected function fireCompleteDetected(string $detect): void
+    protected function fireScanCompleted(string $detect): void
     {
-        $this->scanner->getScanVisitor()->detectCompleted($this, $detect);
+        $this->scanner->getScanVisitor()->scanCompleted($this, $detect);
     }
 
 }

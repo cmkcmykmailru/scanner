@@ -5,6 +5,8 @@ namespace Scanner\Driver\File;
 use Psr\Container\ContainerInterface;
 use Scanner\Driver\Driver;
 use Scanner\Driver\File\Filter\ExtensionFilter;
+use Scanner\Driver\File\Filter\NameWithoutExtFilter;
+use Scanner\Driver\File\Filter\BasenameFilter;
 use Scanner\Driver\File\Filter\PrefixFilter;
 use Scanner\Driver\Normalizer;
 use Scanner\Driver\Parser\Explorer;
@@ -60,7 +62,7 @@ class FileDriver implements Driver
     /**
      * @param array $filterSettings
      * @param ContainerInterface $container
-     * @return array|\Generator
+     * @return \Generator
      */
     public function resolveLeafFilters(array $filterSettings, ContainerInterface $container): \Generator
     {
@@ -69,16 +71,20 @@ class FileDriver implements Driver
             foreach ($filterSettings['FILE'] as $key => $filterSetting) {
 
                 if ($key === 'extension') {
-                    $filter = new ExtensionFilter($filterSetting);
+                    $filter = new ExtensionFilter();
                 } elseif ($key === 'prefix') {
-                    $filter = new PrefixFilter($filterSetting);
+                    $filter = new PrefixFilter();
+                } elseif ($key === 'basename') {
+                    $filter = new BasenameFilter();
+                }elseif ($key === 'name_without_ext') {
+                    $filter = new NameWithoutExtFilter();
                 } else {
-                    if (!$container->has($filterSetting)) {
+                    if (!$container->has($key)) {
                         throw new SearchConfigurationException('Filter class not found.');
                     }
-                    $filter = $container->get($filterSetting);
+                    $filter = $container->get($key);
                 }
-
+                $filter->setConfiguration($filterSetting);
                 yield $filter;
             }
         }
@@ -88,12 +94,20 @@ class FileDriver implements Driver
     {
         if (isset($filterSettings['DIRECTORY'])) {
             foreach ($filterSettings['DIRECTORY'] as $key => $filterSetting) {
-                if (!$container->has($filterSetting)) {
-                    throw new SearchConfigurationException('Filter class' . $filterSetting . ' not found.');
+                if ($key === 'prefix') {
+                    $filter = new PrefixFilter();
+                } elseif ($key === 'basename') {
+                    $filter = new BasenameFilter();
+                } else {
+                    if (!$container->has($key)) {
+                        throw new SearchConfigurationException('Filter class not found.');
+                    }
+                    $filter = $container->get($key);
                 }
-
-                yield $container->get($filterSetting);
+                $filter->setConfiguration($filterSetting);
+                yield $filter;
             }
         }
     }
+
 }

@@ -20,10 +20,11 @@ class FileDriverTest extends TestCase
         $container = $this->createMock(ContainerInterface::class);
         $container->method('get')
             ->willReturn(new class() implements Filter {
-                public function filter(Node $node): bool
+                public function filter( $node): bool
                 {
-                    return $node->getSource() === 'conftest1.php';
+                    return $node === 'conftest1.php';
                 }
+                public function setConfiguration($config): void {}
             });
         $container->method('has')
             ->willReturn(true);
@@ -64,10 +65,11 @@ class FileDriverTest extends TestCase
         $container = $this->createMock(ContainerInterface::class);
         $container->method('get')
             ->willReturn(new class() implements Filter {
-                public function filter(Node $node): bool
+                public function filter($node): bool
                 {
-                    return $node->getSource() === 'conftest1.php';
+                    return $node === 'conftest1.php';
                 }
+                public function setConfiguration($config): void {}
             });
         $container->method('has')
             ->willReturn(true);

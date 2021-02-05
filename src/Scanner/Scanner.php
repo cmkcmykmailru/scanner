@@ -15,7 +15,7 @@ use Scanner\Exception\SearchConfigurationException;
 use Scanner\Filter\Filter;
 use Scanner\Filter\Verifier;
 use Scanner\Strategy\AbstractScanStrategy;
-use Scanner\Strategy\BreadthTraversalScanStrategy;
+use Scanner\Strategy\ProxyScanVisitor;
 use Scanner\Strategy\ScanVisitor;
 
 /**
@@ -27,8 +27,12 @@ class Scanner extends Component
     public const SEARCH = 'SEARCH';
     public const SET_DRIVER = 'SET_DRIVER';
     public const SCAN_VISITOR = 'SCAN_VISITOR';
+    public const PROXY_SCAN_VISITOR = 'PROXY_SCAN_VISITOR';
+    public const LEAF_MULTI_TARGET = 'LEAF_MULTI_TARGET';
+    public const NODE_MULTI_TARGET = 'NODE_MULTI_TARGET';
+    public const SCAN_STRATEGY = 'SCAN_STRATEGY';
     /**
-     * @var Driver
+     * @var Driver|null
      */
     private ?Driver $driver = null;
     private Verifier $leafVerifier;
@@ -37,7 +41,9 @@ class Scanner extends Component
     protected ?SearchSettings $searchSettings = null;
     protected SettingsInstaller $settingsInstaller;
     protected ?ScanVisitor $visitor = null;
-    protected AbstractScanStrategy $traversal;
+    protected ?AbstractScanStrategy $traversal = null;
+    protected bool $leafMultiTarget = true;
+    protected bool $nodeMultiTarget = true;
 
     /**
      * Scanner constructor.
@@ -56,12 +62,53 @@ class Scanner extends Component
         $this->nodeVerifier = new Verifier();
 
         $this->setSettingsInstaller(new DefaultSettingsInstaller($this));
-        $this->traversal = $this->initialScanStrategy();
     }
 
     protected function createContainer(array $config = []): ContainerInterface
     {
         return new ServiceManager($config);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLeafMultiTarget(): bool
+    {
+        return $this->leafMultiTarget;
+    }
+
+    /**
+     * @param bool $leafMultiTarget
+     */
+    public function setLeafMultiTarget(bool $leafMultiTarget): void
+    {
+        if ($this->leafMultiTarget === $leafMultiTarget) {
+            return;
+        }
+        $oldValue = $this->leafMultiTarget;
+        $this->leafMultiTarget = $leafMultiTarget;
+        $this->firePropertyChange(self::LEAF_MULTI_TARGET, $oldValue, $leafMultiTarget);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNodeMultiTarget(): bool
+    {
+        return $this->nodeMultiTarget;
+    }
+
+    /**
+     * @param bool $nodeMultiTarget
+     */
+    public function setNodeMultiTarget(bool $nodeMultiTarget): void
+    {
+        if ($this->nodeMultiTarget === $nodeMultiTarget) {
+            return;
+        }
+        $oldValue = $this->nodeMultiTarget;
+        $this->nodeMultiTarget = $nodeMultiTarget;
+        $this->firePropertyChange(self::NODE_MULTI_TARGET, $oldValue, $nodeMultiTarget);
     }
 
     /**
@@ -113,22 +160,30 @@ class Scanner extends Component
         $this->traversal->detect($detect, $this->driver, $this->leafVerifier, $this->nodeVerifier);
     }
 
-    protected function initialScanStrategy(): AbstractScanStrategy
+    public function setScanStrategy(AbstractScanStrategy $strategy): void
     {
-        if ($this->container->has(AbstractScanStrategy::class)) {
-            $scanStrategy = $this->container->get(AbstractScanStrategy::class);
-            $scanStrategy->installScanner($this);
-            return $scanStrategy;
+        if (!empty($this->traversal)) {
+            $this->traversal->uninstallScanner();
         }
-        $scanStrategy = new BreadthTraversalScanStrategy();
-        $scanStrategy->installScanner($this);
-        return $scanStrategy;
+        $oldValue = $this->traversal;
+        $strategy->installScanner($this);
+        $this->traversal = $strategy;
+        $this->firePropertyChange(self::SCAN_STRATEGY, $oldValue, $strategy);
+    }
+
+    public function getScanStrategy(): AbstractScanStrategy
+    {
+        return $this->traversal;
     }
 
     public function setScanVisitor(ScanVisitor $visitor): void
     {
         $oldValue = $this->visitor;
         $this->visitor = $visitor;
+        if ($visitor instanceof ProxyScanVisitor) {
+            $this->firePropertyChange(self::PROXY_SCAN_VISITOR, $oldValue, $visitor);
+            return;
+        }
         $this->firePropertyChange(self::SCAN_VISITOR, $oldValue, $visitor);
     }
 

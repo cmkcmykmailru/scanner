@@ -2,14 +2,16 @@
 
 namespace ScannerTest\Driver\File;
 
-use Scanner\Driver\Component;
-use Scanner\Driver\Support\Target\TargetHandle;
+use Scanner\Driver\Parser\NodeFactory;
+use Scanner\Strategy\TargetHandler;
 
-class DummyTargetHandle implements TargetHandle
+class DummyTargetHandle implements TargetHandler
 {
-
-    public function handle(Component $component): void
+    public function handle(NodeFactory $factory, $detect, $found)
     {
-        echo $component->getSource();
+        $file = $factory->createLeaf($detect, $found);
+        $source = $file->getSource();
+        $file->revokeAllSupports();
+        return $source;
     }
 }

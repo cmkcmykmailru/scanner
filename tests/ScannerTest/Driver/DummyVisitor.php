@@ -3,31 +3,31 @@
 
 namespace ScannerTest\Driver;
 
-use Scanner\Event\DetectEvent;
-use Scanner\Event\NodeEvent;
+use Scanner\Driver\Parser\NodeFactory;
+use Scanner\Strategy\AbstractScanStrategy;
 use Scanner\Strategy\ScanVisitor;
 
 class DummyVisitor implements  ScanVisitor
 {
 
 
-    public function detectStarted(DetectEvent $evt): void
+    public function scanStarted(AbstractScanStrategy $scanStrategy, $detect): void
     {
-        // TODO: Implement detectStarted() method.
+        // TODO: Implement scanStarted() method.
     }
 
-    public function detectCompleted(DetectEvent $evt): void
+    public function scanCompleted(AbstractScanStrategy $scanStrategy, $detect): void
     {
-        // TODO: Implement detectCompleted() method.
+        // TODO: Implement scanCompleted() method.
     }
 
-    public function leafDetected(NodeEvent $event): void
+    public function visitLeaf(AbstractScanStrategy $scanStrategy, NodeFactory $factory, $detect, $found, $data = null): void
     {
-        // TODO: Implement leafDetected() method.
+        // TODO: Implement visitLeaf() method.
     }
 
-    public function nodeDetected(NodeEvent $event): void
+    public function visitNode(AbstractScanStrategy $scanStrategy, NodeFactory $factory, $detect, $found, $data = null): void
     {
-        // TODO: Implement nodeDetected() method.
+        // TODO: Implement visitNode() method.
     }
 }

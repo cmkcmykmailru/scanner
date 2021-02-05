@@ -2,26 +2,25 @@
 
 namespace Scanner\Driver\File\Filter;
 
-use Scanner\Driver\Node;
+use Scanner\Exception\SearchConfigurationException;
 use Scanner\Filter\Filter;
 
 class ExtensionFilter implements Filter
 {
-    private $filterSetting;
+    private $config;
 
-    /**
-     * ExtensionFilter constructor.
-     * @param $filterSetting
-     */
-    public function __construct($filterSetting)
+    public function filter($path): bool
     {
-        $this->filterSetting = $filterSetting;
+        $pathInfo = pathinfo($path);
+        if (!isset($pathInfo['extension'])) return false;
+        return $this->config === $pathInfo['extension'];
     }
 
-    public function filter(Node $node): bool
+    public function setConfiguration($config): void
     {
-        $pathInfo = pathinfo($node->getSource());
-        if (!isset($pathInfo['extension'])) return false;
-        return $this->filterSetting === $pathInfo['extension'];
+        if (!is_string($config)) {
+            throw new SearchConfigurationException('Invalid filter parameter type. String expected.');
+        }
+        $this->config = $config;
     }
 }

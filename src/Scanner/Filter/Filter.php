@@ -2,9 +2,9 @@
 
 namespace Scanner\Filter;
 
-use Scanner\Driver\Node;
-
 interface Filter
 {
-    public function filter(Node $node): bool;
+    public function filter($found): bool;
+
+    public function setConfiguration($config): void;
 }

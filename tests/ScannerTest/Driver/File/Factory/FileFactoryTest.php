@@ -8,7 +8,7 @@ use Scanner\Driver\ContextSupport;
 use Scanner\Driver\File\Directory;
 use Scanner\Driver\File\File;
 use Scanner\Driver\File\FileFactory;
-use Scanner\Driver\File\System\Read\ReadSupport;
+use Scanner\Driver\File\System\Read\YamlReadSupport;
 use ScannerTest\Driver\File\DummySupport;
 
 class FileFactoryTest extends TestCase
@@ -16,7 +16,7 @@ class FileFactoryTest extends TestCase
     public function testNeedSupportsOf()
     {
         $supportSetting = [
-            'FILE' => [ReadSupport::class],
+            'FILE' => [YamlReadSupport::class],
             'DIRECTORY' => [DummySupport::class]
         ];
 
@@ -37,7 +37,7 @@ class FileFactoryTest extends TestCase
         $storageProp = $reflectionSupport->getProperty('storage');
         $storageProp->setAccessible(true);
         $storage = $storageProp->getValue($support);
-        $sup = ReadSupport::create($filePrototypeValue);
+        $sup = YamlReadSupport::create($filePrototypeValue);
         self::assertContains($sup, $storage);
 
         self::assertCount(1, $storage);//1 method ReadSupport

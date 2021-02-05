@@ -2,6 +2,7 @@
 
 namespace Scanner\Strategy;
 
+use Scanner\Driver\Parser\Explorer;
 use SplQueue;
 
 class BreadthTraversalScanStrategy extends AbstractScanStrategy
@@ -12,42 +13,41 @@ class BreadthTraversalScanStrategy extends AbstractScanStrategy
         if ($this->stop) {
             return;
         }
-        $this->fireStartDetected($detect);
+        $this->fireScanStarted($detect);
 
         $queue = new SplQueue();
         $queue->enqueue($detect);
 
         $nodeFactory = $driver->getNodeFactory();
         $explorer = $driver->getExplorer();
-        $cnode = null;
+        $parser = $driver->getParser();
+        $completeFound = null;
 
         while ($queue->count() > 0) {
-            $cnode = $node = $queue->dequeue();
-            $founds = $driver->getParser()->parese($node);
+            $completeFound = $node = $queue->dequeue();
+            $founds = $parser->parese($node);
+
+            /** @var Explorer $explorer */
             $explorer->setDetect($node);
 
             foreach ($founds as $key => $found) {
                 if ($this->stop) {
-                    $this->fireCompleteDetected($node);
+                    $this->fireScanCompleted($node);
                     return;
                 }
                 if ($explorer->isLeaf($found)) {
-                    $leafFound = $nodeFactory->createLeaf($node, $found);
-
-                    if ($leafVerifier->can($leafFound)) {
-                        $this->fireLeafDetected($leafFound);
+                    if ($leafVerifier->can($explorer->whole())) {
+                        $this->fireVisitLeaf($nodeFactory, $node, $found);
                     }
                 } else {
-                    $nodeFound = $nodeFactory->createNode($node, $found);
-
-                    if ($nodeVerifier->can($nodeFound)) {
-                        $this->fireNodeDetected($nodeFound);
+                    if ($nodeVerifier->can($explorer->whole())) {
+                        $this->fireVisitNode($nodeFactory, $node, $found);
                     }
-                    $queue->enqueue($nodeFound->getSource());
+                    $queue->enqueue($explorer->whole());
                 }
             }
         }
-        $this->fireCompleteDetected($cnode);
+        $this->fireScanCompleted($completeFound);
     }
 
 }

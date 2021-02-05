@@ -4,8 +4,7 @@ namespace ScannerTest\Driver\File\System\Read;
 
 use PHPUnit\Framework\TestCase;
 use Scanner\Driver\File\File;
-use Scanner\Driver\File\System\Read\ReadSupport;
-use Scanner\Driver\File\System\Read\Strategy\YamlReadStrategy;
+use Scanner\Driver\File\System\Read\YamlReadSupport;
 use Scanner\Exception\NotSupportedArgumentException;
 
 class ReadSupportTest extends TestCase
@@ -14,9 +13,9 @@ class ReadSupportTest extends TestCase
     public function testRead()
     {
         $file = new File(__DIR__ . '/test.yml');
-        $support = ReadSupport::create($file);
-        $support->setReadStrategy(new YamlReadStrategy());
-        $yml = $support->read($file);
+        $support = YamlReadSupport::create($file);
+
+        $yml = $support->yamlParseFile($file);
         self::assertIsArray($yml);
         self::assertArrayHasKey('version', $yml);
         self::assertEquals('3.2', $yml['version']);
@@ -25,10 +24,10 @@ class ReadSupportTest extends TestCase
     public function testCreateReadSupport()
     {
         $file = new File(__DIR__ . '/test.yml');
-        $support = ReadSupport::create($file);
-        $support2 = ReadSupport::create($file);
+        $support = YamlReadSupport::create($file);
+        $support2 = YamlReadSupport::create($file);
 
-        $newSupport = new ReadSupport();
+        $newSupport = new YamlReadSupport();
 
         self::assertSame($support, $support2);
         self::assertNotSame($newSupport, $support2);
@@ -39,15 +38,15 @@ class ReadSupportTest extends TestCase
         $this->expectException(NotSupportedArgumentException::class);
 
         $file = new File(__DIR__ . '/test.yml');
-        $file->addSupport(ReadSupport::create($file));
-        $file->read('exception');
+        $file->assignSupport(YamlReadSupport::create($file));
+        $file->yamlParseFile('exception');
     }
 
     public function testAruments()
     {
         $file = new File(__DIR__ . '/test.yml');
-        $file->addSupport(ReadSupport::create($file));
+        $file->assignSupport(YamlReadSupport::create($file));
 
-        self::assertIsArray($file->read());
+        self::assertIsArray($file->yamlParseFile());
     }
 }

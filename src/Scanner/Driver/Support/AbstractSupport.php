@@ -3,6 +3,7 @@
 namespace Scanner\Driver\Support;
 
 use Scanner\Driver\Component;
+use Scanner\Driver\ContextSupport;
 use Scanner\Event\CallMethodEvent;
 use Scanner\Exception\NotSupportedArgumentException;
 
@@ -23,6 +24,16 @@ abstract class AbstractSupport implements Support
 
         $call = [$this, $method];
         return \call_user_func_array($call, $args);
+    }
+
+    protected function assignMethod(Component $component, string $methodName): void
+    {
+        ContextSupport::getFunctionalitySupport($component)->installMethod($this, $methodName);
+    }
+
+    protected function revokeMethod(Component $component, string $methodName): void
+    {
+        ContextSupport::getFunctionalitySupport($component)->uninstallMethod($methodName);
     }
 
     abstract protected function checkArguments($method, $arguments): bool;
