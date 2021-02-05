@@ -6,11 +6,11 @@ use Scanner\Driver\Parser\NodeFactory;
 
 interface ScanVisitor
 {
-    public function detectStarted(AbstractScanStrategy $scanStrategy, $detect): void;
+    public function scanStarted(AbstractScanStrategy $scanStrategy, $detect): void;
 
-    public function detectCompleted(AbstractScanStrategy $scanStrategy, $detect): void;
+    public function scanCompleted(AbstractScanStrategy $scanStrategy, $detect): void;
 
-    public function leafDetected(AbstractScanStrategy $scanStrategy, NodeFactory $factory, $detect, $found): void;
+    public function visitLeaf(AbstractScanStrategy $scanStrategy, NodeFactory $factory, $detect, $found, $data = null): void;
 
-    public function nodeDetected(AbstractScanStrategy $scanStrategy, NodeFactory $factory, $detect, $found): void;
+    public function visitNode(AbstractScanStrategy $scanStrategy, NodeFactory $factory, $detect, $found, $data = null): void;
 }

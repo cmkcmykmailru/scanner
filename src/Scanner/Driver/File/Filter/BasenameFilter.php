@@ -5,14 +5,13 @@ namespace Scanner\Driver\File\Filter;
 use Scanner\Exception\SearchConfigurationException;
 use Scanner\Filter\Filter;
 
-class PrefixFilter implements Filter
+class BasenameFilter implements Filter
 {
     private $config;
 
     public function filter($path): bool
     {
-        $sub = substr(basename($path), 0, mb_strlen($this->config));
-        return $sub === $this->config;
+        return $this->config === basename($path);
     }
 
     public function setConfiguration($config): void

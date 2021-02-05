@@ -2,6 +2,8 @@
 
 namespace Scanner\Strategy;
 
+use Scanner\Driver\Parser\Explorer;
+
 class SingleScanStrategy extends AbstractScanStrategy
 {
 
@@ -10,9 +12,10 @@ class SingleScanStrategy extends AbstractScanStrategy
         if ($this->stop) {
             return;
         }
-        $this->fireStartDetected($detect);
+        $this->fireScanStarted($detect);
 
         $nodeFactory = $driver->getNodeFactory();
+        /** @var Explorer $explorer */
         $explorer = $driver->getExplorer();
 
         $founds = $driver->getParser()->parese($detect);
@@ -20,21 +23,21 @@ class SingleScanStrategy extends AbstractScanStrategy
 
         foreach ($founds as $found) {
             if ($this->stop) {
-                $this->fireCompleteDetected($detect);
+                $this->fireScanCompleted($detect);
                 return;
             }
             if ($explorer->isLeaf($found)) {
-                if ($leafVerifier->can($explorer->next())) {
-                    $this->fireLeafDetected($nodeFactory, $detect, $found);
+                if ($leafVerifier->can($explorer->whole())) {
+                    $this->fireVisitLeaf($nodeFactory, $detect, $found);
                 }
             } else {
-                if ($nodeVerifier->can($explorer->next())) {
-                    $this->fireNodeDetected($nodeFactory, $detect, $found);
+                if ($nodeVerifier->can($explorer->whole())) {
+                    $this->fireVisitNode($nodeFactory, $detect, $found);
                 }
             }
         }
 
-        $this->fireCompleteDetected($detect);
+        $this->fireScanCompleted($detect);
     }
 
 }

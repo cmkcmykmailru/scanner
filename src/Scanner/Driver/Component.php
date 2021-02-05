@@ -7,24 +7,24 @@ use Scanner\Driver\Support\Support;
 
 class Component
 {
-    public function addSupport(Support $support): void
+    public function assignSupport(Support $support): void
     {
         $support->install($this);
     }
 
-    public function removeSupport(Support $support): void
+    public function revokeSupport(Support $support): void
     {
         $support->uninstall($this);
+    }
+
+    public function revokeAllSupports(): void
+    {
+        ContextSupport::removeFunctionalitySupport($this);
     }
 
     public function __call($method, $args)
     {
         return ContextSupport::getFunctionalitySupport($this)->fireCallMethodEvent($this, $method, $args);
-    }
-
-    public function removeSupports(): void
-    {
-        ContextSupport::removeFunctionalitySupport($this);
     }
 
     public function equals(Component $component): bool

@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Scanner\Driver\Parser;
-
 
 interface Explorer
 {
@@ -10,5 +8,5 @@ interface Explorer
 
     public function isLeaf($found): bool;
 
-    public function next();
+    public function whole();
 }

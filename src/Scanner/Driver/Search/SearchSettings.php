@@ -12,8 +12,6 @@ interface SearchSettings
 
     public function strategy(array $parameters): SearchSettings;
 
-    public function handle(array $parameters): SearchSettings;
-
     public function support(array $parameters): SearchSettings;
 
     public function getSearchCriteria(): ?array;
@@ -21,8 +19,6 @@ interface SearchSettings
     public function getFilter(): ?array;
 
     public function getStrategy(): ?array;
-
-    public function getHandle(): ?array;
 
     public function getSupport(): ?array;
 

@@ -13,7 +13,7 @@ class BreadthTraversalScanStrategy extends AbstractScanStrategy
         if ($this->stop) {
             return;
         }
-        $this->fireStartDetected($detect);
+        $this->fireScanStarted($detect);
 
         $queue = new SplQueue();
         $queue->enqueue($detect);
@@ -21,10 +21,10 @@ class BreadthTraversalScanStrategy extends AbstractScanStrategy
         $nodeFactory = $driver->getNodeFactory();
         $explorer = $driver->getExplorer();
         $parser = $driver->getParser();
-        $cnode = null;
+        $completeFound = null;
 
         while ($queue->count() > 0) {
-            $cnode = $node = $queue->dequeue();
+            $completeFound = $node = $queue->dequeue();
             $founds = $parser->parese($node);
 
             /** @var Explorer $explorer */
@@ -32,22 +32,22 @@ class BreadthTraversalScanStrategy extends AbstractScanStrategy
 
             foreach ($founds as $key => $found) {
                 if ($this->stop) {
-                    $this->fireCompleteDetected($node);
+                    $this->fireScanCompleted($node);
                     return;
                 }
                 if ($explorer->isLeaf($found)) {
-                    if ($leafVerifier->can($explorer->next())) {
-                        $this->fireLeafDetected($nodeFactory, $node, $found);
+                    if ($leafVerifier->can($explorer->whole())) {
+                        $this->fireVisitLeaf($nodeFactory, $node, $found);
                     }
                 } else {
-                    if ($nodeVerifier->can($explorer->next())) {
-                        $this->fireNodeDetected($nodeFactory, $node, $found);
+                    if ($nodeVerifier->can($explorer->whole())) {
+                        $this->fireVisitNode($nodeFactory, $node, $found);
                     }
-                    $queue->enqueue($explorer->next());
+                    $queue->enqueue($explorer->whole());
                 }
             }
         }
-        $this->fireCompleteDetected($cnode);
+        $this->fireScanCompleted($completeFound);
     }
 
 }

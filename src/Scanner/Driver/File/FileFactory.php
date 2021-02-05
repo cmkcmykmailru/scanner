@@ -35,13 +35,13 @@ class FileFactory implements NodeFactory
         if (isset($supports['FILE'])) {
             $fileSupports = $supports['FILE'];
             foreach ($fileSupports as $key => $support) {
-                $this->filePrototype->addSupport($support::create($this->filePrototype));
+                $this->filePrototype->assignSupport($support::create($this->filePrototype));
             }
         }
         if (isset($supports['DIRECTORY'])) {
             $directorySupports = $supports['DIRECTORY'];
             foreach ($directorySupports as $key => $support) {
-                $this->directoryPrototype->addSupport($support::create($this->directoryPrototype));
+                $this->directoryPrototype->assignSupport($support::create($this->directoryPrototype));
             }
         }
     }

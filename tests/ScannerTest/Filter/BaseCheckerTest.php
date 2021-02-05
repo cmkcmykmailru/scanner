@@ -18,6 +18,7 @@ class BaseCheckerTest extends TestCase
                 $pathInfo = pathinfo($node);
                 return 'php' === $pathInfo['extension'];
             }
+            public function setConfiguration($config): void {}
         };
 
         $call2 = new class() implements Filter {
@@ -26,6 +27,7 @@ class BaseCheckerTest extends TestCase
                 $sub = substr($node, 0, 4);
                 return $sub === 'conf';
             }
+            public function setConfiguration($config): void {}
         };
 
         $call3 = new class() implements Filter {
@@ -33,6 +35,7 @@ class BaseCheckerTest extends TestCase
             {
                 return $node === 'conftest1.php';
             }
+            public function setConfiguration($config): void {}
         };
 
         $coolFile = 'conftest1.php';

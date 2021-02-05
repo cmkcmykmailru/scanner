@@ -7,7 +7,6 @@ abstract class AbstractSearchSettings implements SearchSettings
     protected array $searchCriteria;
     protected array $filterSettings;
     protected array $strategySettings;
-    protected array $handleSettings;
     protected array $supportSettings;
 
     public function search(array $criteria): SearchSettings
@@ -25,12 +24,6 @@ abstract class AbstractSearchSettings implements SearchSettings
     public function strategy(array $parameters): SearchSettings
     {
         $this->strategySettings = $parameters;
-        return $this;
-    }
-
-    public function handle(array $parameters): SearchSettings
-    {
-        $this->handleSettings = $parameters;
         return $this;
     }
 

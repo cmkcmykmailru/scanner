@@ -24,6 +24,7 @@ class FileDriverTest extends TestCase
                 {
                     return $node === 'conftest1.php';
                 }
+                public function setConfiguration($config): void {}
             });
         $container->method('has')
             ->willReturn(true);
@@ -68,6 +69,7 @@ class FileDriverTest extends TestCase
                 {
                     return $node === 'conftest1.php';
                 }
+                public function setConfiguration($config): void {}
             });
         $container->method('has')
             ->willReturn(true);

@@ -12,14 +12,13 @@ use Scanner\Driver\Search\AbstractSearchSettings;
 class FilesSearchSettings extends AbstractSearchSettings
 {
     /**
-     * 'ALL' | 'FILE' | 'DIRECTORY'
      * 'source' - initial path
      * @return string[]|null
      */
     public function getSearchCriteria(): ?array
     {
         if (empty($this->searchCriteria)) {
-            return ['ALL', 'source' => '/'];
+            return ['source' => '/'];
         }
         return $this->searchCriteria;
     }
@@ -38,14 +37,6 @@ class FilesSearchSettings extends AbstractSearchSettings
             return [];
         }
         return $this->strategySettings;
-    }
-
-    public function getHandle(): ?array
-    {
-        if (empty($this->handleSettings)) {
-            return [];
-        }
-        return $this->handleSettings;
     }
 
     public function getSupport(): ?array

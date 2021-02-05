@@ -1,10 +1,7 @@
 <?php
 
-
 namespace ScannerTest\Driver\File;
 
-
-use Scanner\Driver\ContextSupport;
 use Scanner\Driver\Component;
 use Scanner\Driver\Support\AbstractSupport;
 use Scanner\Driver\Support\Support;
@@ -15,16 +12,16 @@ class DummySupport extends AbstractSupport
 
     protected function installMethods(Component $component): void
     {
-        ContextSupport::getFunctionalitySupport($component)->installMethod($this, 'get1');
-        ContextSupport::getFunctionalitySupport($component)->installMethod($this, 'get2');
-        ContextSupport::getFunctionalitySupport($component)->installMethod($this, 'get3');
+        $this->assignMethod($component, 'get1');
+        $this->assignMethod($component, 'get2');
+        $this->assignMethod($component, 'get3');
     }
 
     protected function uninstallMethods(Component $component): void
     {
-        ContextSupport::getFunctionalitySupport($component)->uninstallMethod($this, 'get1');
-        ContextSupport::getFunctionalitySupport($component)->uninstallMethod($this, 'get2');
-        ContextSupport::getFunctionalitySupport($component)->uninstallMethod($this, 'get3');
+        $this->revokeMethod($component, 'get1');
+        $this->revokeMethod($component, 'get2');
+        $this->revokeMethod($component, 'get3');
     }
 
     public static function create(Component $component): Support
