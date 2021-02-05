@@ -32,7 +32,7 @@ class DefaultSettingsInstaller implements SettingsInstaller, PropertyListener
         if (empty($filterSettings)) {
             return;
         }
-        $driver = $settings->getDriver();
+        $driver = $this->scanner->getDriver();
 
         $this->scanner->resetLeafFilters();
         $this->scanner->resetNodeFilters();
@@ -93,6 +93,12 @@ class DefaultSettingsInstaller implements SettingsInstaller, PropertyListener
         $this->scanner->setScanStrategy($strategy);
 
         if (!isset($strategyParams['handle'])) {
+            $proxyVisitor = $this->scanner->getScanVisitor();
+            if ($proxyVisitor instanceof ProxyScanVisitor) {
+                $visitor = $proxyVisitor->extract();
+                $proxyVisitor->clear();
+                $this->scanner->setScanVisitor($visitor);
+            }
             return;
         }
 
@@ -137,16 +143,28 @@ class DefaultSettingsInstaller implements SettingsInstaller, PropertyListener
         }
         $realVisitor = $this->scanner->getScanVisitor();
 
+        if ($realVisitor instanceof ProxyScanVisitor) {
+            $realVisitor->update($this->scanner, $leafHandler, $nodeHandler);
+            return;
+        }
         $this->scanner->setScanVisitor(new ProxyScanVisitor($this->scanner, $realVisitor, $leafHandler, $nodeHandler));
     }
 
     public function propertyChanged(PropertyEvent $evt): void
     {
-        $settings = $evt->getNewProperty();
-        $this->setupFilters($settings);
-        $this->setupDriver($settings);
-        $this->setupSupports($settings);
-        $this->setupStrategy($settings);
+        if ($evt->getType() === Scanner::SEARCH) {
+            $settings = $evt->getNewProperty();
+            $this->setupDriver($settings);
+            $this->setupFilters($settings);
+            $this->setupSupports($settings);
+            $this->setupStrategy($settings);
+        } elseif ($evt->getType() === Scanner::SCAN_VISITOR) {
+            $oldVisitor = $evt->getOldProperty();
+            $newVisitor = $evt->getNewProperty();
+            if ($oldVisitor instanceof ProxyScanVisitor && !$newVisitor instanceof ProxyScanVisitor) {
+                $oldVisitor->clear();
+            }
+        }
     }
 
     /**
@@ -166,11 +184,13 @@ class DefaultSettingsInstaller implements SettingsInstaller, PropertyListener
     private function installListeners(): void
     {
         $this->scanner->addPropertyListener($this, Scanner::SEARCH);
+        $this->scanner->addPropertyListener($this, Scanner::SCAN_VISITOR);
     }
 
     private function uninstallListeners(): void
     {
         $this->scanner->removePropertyListener($this, Scanner::SEARCH);
+        $this->scanner->removePropertyListener($this, Scanner::SCAN_VISITOR);
     }
 
     public function uninstall(Scanner $scanner): void
