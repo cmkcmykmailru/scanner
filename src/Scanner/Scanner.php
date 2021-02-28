@@ -132,9 +132,8 @@ class Scanner extends Component
 
     public function search(SearchSettings $settings): void
     {
-        $oldValue = $this->searchSettings;
-        $this->searchSettings = $settings;
-        $this->firePropertyChange(self::SEARCH, $oldValue, $settings);
+        $this->setSearchSettings($settings);
+
         $criteria = $this->searchSettings->getSearchCriteria();
 
         if (!isset($criteria['source'])) {
@@ -142,6 +141,18 @@ class Scanner extends Component
         }
 
         $this->detect($criteria['source']);
+    }
+
+    public function setSearchSettings(SearchSettings $settings): void
+    {
+        $oldValue = $this->searchSettings;
+        $this->searchSettings = $settings;
+        $this->firePropertyChange(self::SEARCH, $oldValue, $settings);
+    }
+
+    public function searchAgain($source): void
+    {
+        $this->detect($source);
     }
 
     /**
