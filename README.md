@@ -162,7 +162,7 @@ ______________________________
 
 ```
 Пример реального использования вы можете посмотреть в проекте который генерирует настройки rest api в Yii2
-на основе аннотаций [yii2-rest](https://github.com/cmkcmykmailru/yii2-rest)
+на основе аннотаций [yii2-generator](https://github.com/cmkcmykmailru/yii2-generator), [yii2-rest](https://github.com/cmkcmykmailru/yii2-rest) 
 ### Тестировать
 
 ```
