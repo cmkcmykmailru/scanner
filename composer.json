@@ -2,7 +2,7 @@
   "name": "grigor/scanner",
   "description": "Сканер",
   "license": "MIT",
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "require": {
     "php": ">=7.4",
     "ext-yaml": "*",
