@@ -2,6 +2,12 @@
   "name": "grigor/scanner",
   "description": "Сканер",
   "license": "MIT",
+  "authors": [
+    {
+      "name": "grigor",
+      "email": "cmk.cmyk@mail.ru"
+    }
+  ],
   "minimum-stability": "stable",
   "require": {
     "php": ">=7.4",
