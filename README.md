@@ -13,13 +13,13 @@ Scanner
 Запустите команду
 
 ```
-php composer.phar require --prefer-dist grigor/scanner "*"
+php composer require --prefer-dist grigor/scanner "1.0.1"
 ```
 
 или добавьте в composer.json
 
 ```
-"grigor/scanner": "*"
+"grigor/scanner": "~1.0.1"
 ```
 
 ### Базовое использование
